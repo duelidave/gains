@@ -46,6 +46,7 @@ jobs:
         with:
           context: ./backend
           platforms: ${{ matrix.platform }}
+          provenance: false
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/gains-backend:${{ steps.version.outputs.version }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
@@ -55,6 +56,7 @@ jobs:
         with:
           context: ./frontend
           platforms: ${{ matrix.platform }}
+          provenance: false
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/gains-frontend:${{ steps.version.outputs.version }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
