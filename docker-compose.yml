@@ -9,6 +9,7 @@ services:
       - mongo-data:/data/db
 
   backend:
+    image: ghcr.io/duelidave/gains-backend:latest
     build:
       context: ./backend
     restart: unless-stopped
@@ -34,6 +35,7 @@ services:
       - mongodb
 
   frontend:
+    image: ghcr.io/duelidave/gains-frontend:latest
     build:
       context: ./frontend
     restart: unless-stopped
