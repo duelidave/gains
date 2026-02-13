@@ -42,12 +42,29 @@ cp .env.example .env
 docker compose up -d
 ```
 
+This pulls pre-built images from GitHub Container Registry and starts the app. No build step needed.
+
 The app starts in **local auth mode** by default — the simplest setup. Users register with email and password, no external auth provider needed.
 
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:4000/api
 
 > **Note:** To enable AI-powered workout parsing, add your [Anthropic API key](https://console.anthropic.com/) to `.env`. The app works without it, but natural language parsing will be disabled.
+
+### Docker Images
+
+Pre-built images are published to GitHub Container Registry:
+
+```
+ghcr.io/duelidave/gains-backend:latest
+ghcr.io/duelidave/gains-frontend:latest
+```
+
+To build from source instead:
+
+```bash
+docker compose up -d --build
+```
 
 ## Configuration
 
