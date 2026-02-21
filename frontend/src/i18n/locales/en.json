@@ -40,7 +40,8 @@
     "noWorkoutsDescription": "Log your first workout to start tracking!",
     "logWorkout": "Log Workout",
     "ex": "{{count}} ex",
-    "setsCount": "{{count}} sets"
+    "setsCount": "{{count}} sets",
+    "continueWorkout": "Continue Workout"
   },
   "workoutDetail": {
     "editWorkout": "Edit Workout",

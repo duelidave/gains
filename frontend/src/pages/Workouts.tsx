@@ -10,6 +10,7 @@ import { EmptyState } from '../components/EmptyState';
 import { getWorkouts } from '../lib/api';
 import type { Workout } from '../types';
 import { formatDate } from '../lib/date';
+import { hasChatSession } from '../lib/chatSession';
 
 export default function Workouts() {
   const { t, i18n } = useTranslation();
@@ -19,6 +20,7 @@ export default function Workouts() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
+  const hasSession = hasChatSession();
 
   const fetchWorkouts = useCallback(async () => {
     setLoading(true);
@@ -47,7 +49,7 @@ export default function Workouts() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{t('workouts.title')}</h1>
         <Button variant="primary" size="sm" onClick={() => navigate('/workouts/new')}>
-          <Plus size={16} /> {t('workouts.newWorkout')}
+          <Plus size={16} /> {hasSession ? t('workouts.continueWorkout') : t('workouts.newWorkout')}
         </Button>
       </div>
 

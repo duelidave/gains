@@ -12,10 +12,9 @@ import { formatWeight } from '../lib/units';
 import { toDisplayExercise } from '../lib/mappers';
 import type { WorkoutInput, Workout, ApiSet } from '../types';
 import { formatDate } from '../lib/date';
+import { CHAT_SESSION_KEY } from '../lib/chatSession';
 
 type Phase = 'chat' | 'loading' | 'preview';
-
-const CHAT_SESSION_KEY = 'gains-workout-chat';
 
 interface ChatSessionState {
   messages: string[];

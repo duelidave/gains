@@ -2,15 +2,17 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Dumbbell, TrendingUp, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
+import { hasChatSession } from '../lib/chatSession';
 
 export function BottomNav() {
   const { t } = useTranslation();
+  const hasSession = hasChatSession();
 
   const links = [
-    { to: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
-    { to: '/workouts', icon: Dumbbell, label: t('nav.workouts') },
-    { to: '/progress', icon: TrendingUp, label: t('nav.progress') },
-    { to: '/profile', icon: User, label: t('nav.profile') },
+    { to: '/', icon: LayoutDashboard, label: t('nav.dashboard'), dot: false },
+    { to: '/workouts', icon: Dumbbell, label: t('nav.workouts'), dot: hasSession },
+    { to: '/progress', icon: TrendingUp, label: t('nav.progress'), dot: false },
+    { to: '/profile', icon: User, label: t('nav.profile'), dot: false },
   ];
 
   return (
@@ -19,7 +21,7 @@ export function BottomNav() {
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="flex justify-around">
-        {links.map(({ to, icon: Icon, label }) => (
+        {links.map(({ to, icon: Icon, label, dot }) => (
           <NavLink
             key={to}
             to={to}
@@ -31,7 +33,10 @@ export function BottomNav() {
               )
             }
           >
-            <Icon size={20} />
+            <span className="relative">
+              <Icon size={20} />
+              {dot && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-blue-500" />}
+            </span>
             <span>{label}</span>
           </NavLink>
         ))}
