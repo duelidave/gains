@@ -5,7 +5,7 @@
 > AI-powered workout tracking with natural language input. Built entirely by Claude.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0--beta-orange)](https://github.com/duelidave/gains/releases)
+[![Version](https://img.shields.io/badge/version-0.2.0-orange)](https://github.com/duelidave/gains/releases)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](docker-compose.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Built by Claude](https://img.shields.io/badge/Built%20by-Claude-cc785c?logo=anthropic&logoColor=white)](https://claude.ai)
@@ -24,13 +24,11 @@ GAINS is a self-hosted fitness tracker that lets you log workouts in natural lan
 ## Features
 
 - **Natural language workout logging** — describe your workout in plain text and AI parses it into structured data (powered by Claude API)
-- **Dashboard** — streak tracking, weekly volume, and training stats at a glance
-- **Exercise progress tracking** — automatic PR detection and historical charts
-- **Multi-language** — English and German (easily extensible)
-- **Dark / Light mode** — system-aware with manual toggle
-- **Flexible authentication** — local accounts, Keycloak, or any OIDC provider (Google, GitHub, Authentik, etc.)
-- **Mobile-first responsive design** — works great on phone, tablet, and desktop
-- **Unit conversion** — switch between kg/lbs and km/mi
+- **Progress tracking** — automatic PR detection, estimated 1RM (Epley), and historical charts
+- **Smart exercise matching** — AI normalizes exercise names against your history to prevent duplicates
+- **Last workout reference** — see what you did last time while logging a new session
+- **Flexible auth** — local accounts, Keycloak, or any OIDC provider (Google, GitHub, Authentik, etc.)
+- **Self-hosted** — runs on your own hardware via Docker, your data stays yours
 
 ## Quick Start
 

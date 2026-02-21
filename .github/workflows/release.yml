@@ -107,3 +107,25 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/gains-frontend:${{ steps.version.outputs.version }}-amd64 \
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/gains-frontend:${{ steps.version.outputs.version }}-arm64
           docker manifest push ${{ env.REGISTRY }}/${{ github.repository_owner }}/gains-frontend:latest
+
+  create-release:
+    needs: merge-manifests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ steps.version.outputs.version }} \
+            --title "${{ steps.version.outputs.version }}" \
+            --generate-notes
