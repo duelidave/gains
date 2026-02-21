@@ -51,6 +51,11 @@ export function getWorkout(id: string) {
   return request<Workout>(`/workouts/${id}`);
 }
 
+export function getLatestWorkout(title: string) {
+  const params = new URLSearchParams({ title });
+  return request<Workout | null>(`/workouts/latest?${params}`);
+}
+
 export function createWorkout(data: WorkoutInput) {
   return request<Workout>('/workouts', {
     method: 'POST',
@@ -103,6 +108,13 @@ export function getProgress(exercise: string, period: string) {
 // Exercises (autocomplete)
 export function getExerciseNames() {
   return request<string[]>('/exercises');
+}
+
+export function mergeExercises(from: string, to: string) {
+  return request<{ modified: number }>('/exercises/merge', {
+    method: 'POST',
+    body: JSON.stringify({ from, to }),
+  });
 }
 
 // Settings

@@ -74,6 +74,9 @@ export interface ProgressPoint {
   date: string;
   value: number;
   isPR: boolean;
+  e1rm?: number;
+  isE1rmPR?: boolean;
+  bestSet?: { reps: number; weight: number; setsCount: number } | null;
 }
 
 export interface PaginatedResponse<T> {

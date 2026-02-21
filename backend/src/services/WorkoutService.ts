@@ -43,6 +43,10 @@ export const WorkoutService = {
     return workout;
   },
 
+  async getLatestByTitle(userId: string, title: string): Promise<IWorkout | null> {
+    return Workout.findOne({ userId, title }).sort({ date: -1 }).limit(1);
+  },
+
   async create(
     userId: string,
     data: { title: string; date?: string; notes?: string; exercises?: unknown[]; duration?: number },

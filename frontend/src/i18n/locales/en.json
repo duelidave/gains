@@ -75,6 +75,8 @@
     "saveWorkout": "Save Workout",
     "saving": "Saving...",
     "backToChat": "Back to Chat",
+    "discard": "Start Over",
+    "lastWorkout": "Last {{title}} — {{date}}",
     "reps": "Reps",
     "weight": "Weight",
     "duration": "Duration"
@@ -87,7 +89,15 @@
     "noData": "No data yet",
     "noDataDescription": "Log \"{{exercise}}\" in your workouts to track progression",
     "personalRecord": "Personal Record",
-    "personalRecords": "Personal Records"
+    "personalRecords": "Personal Records",
+    "weight": "Weight",
+    "estimatedOneRM": "est. 1RM",
+    "history": "History",
+    "date": "Date",
+    "sets": "Sets",
+    "e1rm": "est. 1RM",
+    "mergeExercise": "Merge Exercise",
+    "mergeInto": "Merge \"{{from}}\" into:"
   },
   "profile": {
     "title": "Profile",

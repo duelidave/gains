@@ -9,10 +9,10 @@ import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/EmptyState';
 import { getWorkouts } from '../lib/api';
 import type { Workout } from '../types';
-import { format, parseISO } from 'date-fns';
+import { formatDate } from '../lib/date';
 
 export default function Workouts() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +75,7 @@ export default function Workouts() {
                     <div className="min-w-0 flex-1">
                       <h3 className="font-medium text-sm text-zinc-900 dark:text-zinc-50 truncate">{w.title}</h3>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                        {format(parseISO(w.date), 'MMM d, yyyy')}
+                        {formatDate(w.date, 'short', i18n.language)}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 ml-3">

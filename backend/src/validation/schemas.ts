@@ -65,6 +65,13 @@ export const parseRequestSchema = z.object({
   messages: z.array(z.string().min(1).max(1000)).min(1, 'messages must be a non-empty array of strings').max(50),
 });
 
+// ---------- Exercise merge schema ----------
+
+export const mergeExercisesSchema = z.object({
+  from: z.string().min(1, 'Source exercise name is required'),
+  to: z.string().min(1, 'Target exercise name is required'),
+});
+
 // ---------- Validation middleware factory ----------
 
 export function validateBody(schema: z.ZodSchema) {

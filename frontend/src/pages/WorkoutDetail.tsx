@@ -13,10 +13,10 @@ import { useSettings } from '../context/SettingsContext';
 import { formatWeight, formatDistance } from '../lib/units';
 import { toDisplayExercise } from '../lib/mappers';
 import type { Workout, WorkoutInput } from '../types';
-import { format, parseISO } from 'date-fns';
+import { formatDate } from '../lib/date';
 
 export default function WorkoutDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { settings } = useSettings();
@@ -120,7 +120,7 @@ export default function WorkoutDetail() {
         <div className="flex-1 min-w-0">
           <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-50 truncate">{workout.title}</h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {format(parseISO(workout.date), 'EEEE, MMMM d, yyyy')}
+            {formatDate(workout.date, 'long', i18n.language)}
           </p>
         </div>
         <div className="flex gap-2">

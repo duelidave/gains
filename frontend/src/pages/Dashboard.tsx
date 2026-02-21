@@ -20,10 +20,10 @@ import { useTheme } from '../context/ThemeContext';
 import { getStreak, getWeeklyStats, getVolumeStats, getWorkouts } from '../lib/api';
 import { convertWeight } from '../lib/units';
 import type { StreakData, WeeklyData, VolumeData, Workout } from '../types';
-import { format, parseISO } from 'date-fns';
+import { formatDate } from '../lib/date';
 
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { fullName } = useAuth();
   const { settings } = useSettings();
   const { dark } = useTheme();
@@ -91,7 +91,7 @@ export default function Dashboard() {
           {t('dashboard.greeting', { name: firstName })}
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-          {format(new Date(), 'EEEE, MMMM d')}
+          {formatDate(new Date().toISOString(), 'longNoYear', i18n.language)}
         </p>
       </div>
 
@@ -200,7 +200,7 @@ export default function Dashboard() {
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm text-zinc-900 dark:text-zinc-50 truncate">{w.title}</p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                    {format(parseISO(w.date), 'MMM d, yyyy')}
+                    {formatDate(w.date, 'short', i18n.language)}
                   </p>
                 </div>
                 <Badge>{t('dashboard.exerciseCount', { count: w.exercises.length })}</Badge>

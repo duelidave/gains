@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { AuthRequest } from '../types';
 import { sendProblem } from '../middleware/errorHandler';
 import { createWorkoutSchema, parseRequestSchema, validateBody } from '../validation/schemas';
+import { ExerciseService } from '../services/ExerciseService';
 
 const router = Router();
 
@@ -12,11 +13,23 @@ router.post('/', validateBody(parseRequestSchema), async (req: AuthRequest, res:
   try {
     const { messages } = req.body;
 
+    // Fetch existing exercise names for normalization
+    const existingNames = await ExerciseService.getNames(req.user!.keycloakId);
+    const namesList = existingNames.slice(0, 200);
+
+    const exerciseNameSection = namesList.length > 0
+      ? `\nEXERCISE NAME NORMALIZATION:
+The user has previously logged these exercise names:
+${namesList.map(n => `- "${n}"`).join('\n')}
+
+When the user types an exercise that matches one of these (even with different casing, spelling, abbreviation, singular/plural, or missing qualifiers like "(Maschine)" or "(KH)"), you MUST use the EXISTING name from the list above. Only create a new exercise name if it truly does not match any existing name.\n`
+      : '';
+
     const today = new Date().toISOString().split('T')[0];
 
     const prompt = `You are a fitness workout parser. Parse the following gym workout messages into structured JSON.
 The user logs exercises one message at a time. The first message usually indicates the workout type.
-
+${exerciseNameSection}
 WORKOUT TYPES (title must be exactly one of these):
 - "Brust" — chest workouts (Bankdrücken, Fliegende, Butterfly, Dips, etc.)
 - "Rücken" — back workouts (Klimmzüge, Rudern, Latzug, Kreuzheben, etc.)
@@ -27,7 +40,7 @@ Always map to exactly one of: "Brust", "Rücken", "Beine" as the title.
 If the workout type is unclear from context, infer it from the exercises.
 
 Rules:
-- Exercise names: keep the original name the user typed
+- Exercise names: use existing names from the list above when possible, otherwise keep the original name the user typed
 - "5x5 40kg" means 5 sets of 5 reps at 40kg
 - "3x8" without weight means 3 sets of 8 reps, weight: 0
 - "pro Hand" or "per hand" means weight_unit: "per_hand"

@@ -11,4 +11,13 @@ export const ExerciseService = {
 
     return result.map((r) => r._id as string);
   },
+
+  async merge(userId: string, fromName: string, toName: string): Promise<number> {
+    const result = await Workout.updateMany(
+      { userId, 'exercises.name': fromName },
+      { $set: { 'exercises.$[elem].name': toName } },
+      { arrayFilters: [{ 'elem.name': fromName }] },
+    );
+    return result.modifiedCount;
+  },
 };

@@ -31,6 +31,25 @@ router.post('/', validateBody(createWorkoutSchema), async (req: AuthRequest, res
   }
 });
 
+// Get latest workout by title (for reference during new workout)
+router.get('/latest', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const title = (req.query.title as string) || '';
+    if (!title) {
+      res.json(null);
+      return;
+    }
+    const workout = await WorkoutService.getLatestByTitle(req.user!.keycloakId, title);
+    if (!workout) {
+      res.json(null);
+      return;
+    }
+    res.json(toWorkoutResponse(workout));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Get single workout
 router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

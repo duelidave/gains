@@ -75,6 +75,8 @@
     "saveWorkout": "Workout speichern",
     "saving": "Speichern...",
     "backToChat": "Zurück zum Chat",
+    "discard": "Neu beginnen",
+    "lastWorkout": "Letztes {{title}} — {{date}}",
     "reps": "Wdh.",
     "weight": "Gewicht",
     "duration": "Dauer"
@@ -87,7 +89,15 @@
     "noData": "Noch keine Daten",
     "noDataDescription": "Logge \"{{exercise}}\" in deinen Workouts, um den Fortschritt zu verfolgen",
     "personalRecord": "Persönlicher Rekord",
-    "personalRecords": "Persönliche Rekorde"
+    "personalRecords": "Persönliche Rekorde",
+    "weight": "Gewicht",
+    "estimatedOneRM": "gesch. 1RM",
+    "history": "Verlauf",
+    "date": "Datum",
+    "sets": "Sätze",
+    "e1rm": "gesch. 1RM",
+    "mergeExercise": "Übung zusammenführen",
+    "mergeInto": "\"{{from}}\" zusammenführen mit:"
   },
   "profile": {
     "title": "Profil",

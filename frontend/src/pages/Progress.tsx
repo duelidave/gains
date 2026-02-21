@@ -7,20 +7,23 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
-import { TrendingUp, Trophy, Search } from 'lucide-react';
+import { TrendingUp, Trophy, Search, GitMerge } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Skeleton } from '../components/ui/Skeleton';
 import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
+import { Dialog, DialogTitle } from '../components/ui/Dialog';
 import { EmptyState } from '../components/EmptyState';
-import { getExerciseNames, getProgress } from '../lib/api';
+import { getExerciseNames, getProgress, mergeExercises } from '../lib/api';
 import { useSettings } from '../context/SettingsContext';
 import { useTheme } from '../context/ThemeContext';
 import { convertWeight } from '../lib/units';
 import type { ProgressPoint } from '../types';
 
 const periods = ['1M', '3M', '6M', '1Y', 'All'] as const;
+type ChartMode = 'weight' | 'e1rm';
 
 export default function Progress() {
   const { t } = useTranslation();
@@ -31,9 +34,12 @@ export default function Progress() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [period, setPeriod] = useState<string>('3M');
+  const [chartMode, setChartMode] = useState<ChartMode>('weight');
   const [data, setData] = useState<ProgressPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingNames, setLoadingNames] = useState(true);
+  const [mergeFrom, setMergeFrom] = useState<string | null>(null);
+  const [merging, setMerging] = useState(false);
 
   const tooltipStyle = {
     backgroundColor: dark ? '#27272a' : '#ffffff',
@@ -43,12 +49,15 @@ export default function Progress() {
     color: dark ? '#fafafa' : '#18181b',
   };
 
-  useEffect(() => {
+  const fetchNames = () => {
+    setLoadingNames(true);
     getExerciseNames()
       .then(setExerciseNames)
       .catch(() => {})
       .finally(() => setLoadingNames(false));
-  }, []);
+  };
+
+  useEffect(fetchNames, []);
 
   useEffect(() => {
     if (!selectedExercise) return;
@@ -66,9 +75,34 @@ export default function Progress() {
   const dataConverted = data.map((p) => ({
     ...p,
     value: settings.weightUnit === 'lbs' ? Number(convertWeight(p.value, 'kg', 'lbs').toFixed(1)) : p.value,
+    e1rm: p.e1rm != null
+      ? (settings.weightUnit === 'lbs' ? Number(convertWeight(p.e1rm, 'kg', 'lbs').toFixed(1)) : Math.round(p.e1rm * 10) / 10)
+      : 0,
+    bestSetWeight: p.bestSet?.weight != null
+      ? (settings.weightUnit === 'lbs' ? Number(convertWeight(p.bestSet.weight, 'kg', 'lbs').toFixed(1)) : p.bestSet.weight)
+      : 0,
   }));
 
-  const prs = dataConverted.filter((p) => p.isPR);
+  const prs = chartMode === 'e1rm'
+    ? dataConverted.filter((p) => p.isE1rmPR)
+    : dataConverted.filter((p) => p.isPR);
+
+  const chartDataKey = chartMode === 'e1rm' ? 'e1rm' : 'value';
+
+  const handleMerge = async (to: string) => {
+    if (!mergeFrom || mergeFrom === to) return;
+    setMerging(true);
+    try {
+      await mergeExercises(mergeFrom, to);
+      setMergeFrom(null);
+      if (selectedExercise === mergeFrom) setSelectedExercise(to);
+      fetchNames();
+    } catch {
+      // ignore
+    } finally {
+      setMerging(false);
+    }
+  };
 
   return (
     <div className="space-y-5 min-w-0 w-full">
@@ -95,18 +129,34 @@ export default function Progress() {
         {showDropdown && filtered.length > 0 && (
           <div className="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 shadow-xl">
             {filtered.map((name) => (
-              <button
+              <div
                 key={name}
-                type="button"
-                className="w-full text-left px-3 py-2.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-50"
-                onMouseDown={() => {
-                  setSelectedExercise(name);
-                  setSearchQuery('');
-                  setShowDropdown(false);
-                }}
+                className="flex items-center hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
-                {name}
-              </button>
+                <button
+                  type="button"
+                  className="flex-1 text-left px-3 py-2.5 text-sm text-zinc-900 dark:text-zinc-50"
+                  onMouseDown={() => {
+                    setSelectedExercise(name);
+                    setSearchQuery('');
+                    setShowDropdown(false);
+                  }}
+                >
+                  {name}
+                </button>
+                <button
+                  type="button"
+                  className="px-2 py-2.5 text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400"
+                  title={t('progress.mergeExercise')}
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    setMergeFrom(name);
+                    setShowDropdown(false);
+                  }}
+                >
+                  <GitMerge size={14} />
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -147,6 +197,23 @@ export default function Progress() {
             ))}
           </div>
 
+          {/* Chart mode toggle */}
+          <div className="flex gap-1.5">
+            {(['weight', 'e1rm'] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setChartMode(mode)}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors ${
+                  chartMode === mode
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+                }`}
+              >
+                {mode === 'weight' ? t('progress.weight') : t('progress.estimatedOneRM')}
+              </button>
+            ))}
+          </div>
+
           {/* Chart */}
           <Card>
             <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">{selectedExercise}</p>
@@ -168,11 +235,14 @@ export default function Progress() {
                 />
                 <Tooltip
                   contentStyle={tooltipStyle}
-                  formatter={(value: number) => [`${value} ${settings.weightUnit}`, '']}
+                  formatter={(value: number) => [
+                    `${value} ${settings.weightUnit}`,
+                    chartMode === 'e1rm' ? 'est. 1RM' : '',
+                  ]}
                 />
                 <Area
                   type="monotone"
-                  dataKey="value"
+                  dataKey={chartDataKey}
                   stroke="#3b82f6"
                   strokeWidth={2}
                   fill="url(#progressGradient)"
@@ -182,7 +252,7 @@ export default function Progress() {
                   <ReferenceDot
                     key={i}
                     x={pr.date}
-                    y={pr.value}
+                    y={chartMode === 'e1rm' ? pr.e1rm : pr.value}
                     r={6}
                     fill="#eab308"
                     stroke={dark ? '#18181b' : '#ffffff'}
@@ -211,15 +281,88 @@ export default function Progress() {
                   <div key={i} className="flex items-center justify-between py-2.5">
                     <span className="text-sm text-zinc-500 dark:text-zinc-400">{pr.date}</span>
                     <Badge variant="warning">
-                      <span className="tabular-nums font-bold">{pr.value} {settings.weightUnit}</span>
+                      <span className="tabular-nums font-bold">
+                        {chartMode === 'e1rm' ? pr.e1rm : pr.value} {settings.weightUnit}
+                      </span>
                     </Badge>
                   </div>
                 ))}
               </div>
             </Card>
           )}
+
+          {/* History Table */}
+          <Card>
+            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
+              {t('progress.history')}
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-zinc-600 dark:text-zinc-500 text-xs uppercase tracking-wide">
+                    <th className="text-left py-2 pr-4 font-medium">{t('progress.date')}</th>
+                    <th className="text-left py-2 pr-4 font-medium">{t('progress.sets')}</th>
+                    <th className="text-right py-2 pr-4 font-medium">{t('progress.weight')}</th>
+                    <th className="text-right py-2 font-medium">{t('progress.e1rm')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...dataConverted].reverse().map((point, i) => (
+                    <tr key={i} className="border-t border-zinc-200 dark:border-zinc-800">
+                      <td className="py-2.5 pr-4 text-zinc-500 dark:text-zinc-400 tabular-nums">
+                        {point.date.slice(5)}
+                      </td>
+                      <td className="py-2.5 pr-4 text-zinc-900 dark:text-zinc-50 tabular-nums">
+                        {point.bestSet
+                          ? `${point.bestSet.setsCount}x${point.bestSet.reps}`
+                          : '-'}
+                      </td>
+                      <td className="py-2.5 pr-4 text-right text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
+                        {point.bestSetWeight > 0
+                          ? `${point.bestSetWeight} ${settings.weightUnit}`
+                          : '-'}
+                      </td>
+                      <td className="py-2.5 text-right text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
+                        {point.e1rm > 0
+                          ? `${point.e1rm} ${settings.weightUnit}`
+                          : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         </>
       )}
+
+      {/* Merge Exercise Dialog */}
+      <Dialog open={!!mergeFrom} onClose={() => setMergeFrom(null)}>
+        <DialogTitle>{t('progress.mergeExercise')}</DialogTitle>
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
+          {t('progress.mergeInto', { from: mergeFrom })}
+        </p>
+        <div className="max-h-60 overflow-y-auto space-y-1">
+          {exerciseNames
+            .filter((n) => n !== mergeFrom)
+            .map((name) => (
+              <button
+                key={name}
+                type="button"
+                className="w-full text-left px-3 py-2.5 text-sm rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-50"
+                onClick={() => handleMerge(name)}
+                disabled={merging}
+              >
+                {name}
+              </button>
+            ))}
+        </div>
+        <div className="flex justify-end mt-4">
+          <Button variant="default" size="sm" onClick={() => setMergeFrom(null)} disabled={merging}>
+            {t('common.cancel')}
+          </Button>
+        </div>
+      </Dialog>
     </div>
   );
 }

@@ -15,12 +15,21 @@ function getFromDate(period: string): Date | null {
   }
 }
 
+interface ProgressionPoint {
+  date: string;
+  value: number;
+  isPR: boolean;
+  e1rm: number;
+  isE1rmPR: boolean;
+  bestSet: { reps: number; weight: number; setsCount: number } | null;
+}
+
 export const ProgressService = {
   async getProgression(
     userId: string,
     exerciseName: string,
     period: string,
-  ): Promise<Array<{ date: string; value: number; isPR: boolean }>> {
+  ): Promise<ProgressionPoint[]> {
     if (!exerciseName) return [];
 
     const fromDate = getFromDate(period);
@@ -37,20 +46,75 @@ export const ProgressService = {
       },
       { $unwind: '$exercises.sets' },
       {
+        $addFields: {
+          'exercises.sets.e1rm': {
+            $cond: {
+              if: { $and: [
+                { $gt: [{ $ifNull: ['$exercises.sets.weight', 0] }, 0] },
+                { $gt: [{ $ifNull: ['$exercises.sets.reps', 0] }, 0] },
+              ]},
+              then: {
+                $multiply: [
+                  '$exercises.sets.weight',
+                  { $add: [1, { $divide: ['$exercises.sets.reps', 30] }] },
+                ],
+              },
+              else: 0,
+            },
+          },
+        },
+      },
+      {
         $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
           bestWeight: { $max: { $ifNull: ['$exercises.sets.weight', 0] } },
+          bestE1rm: { $max: '$exercises.sets.e1rm' },
+          sets: { $push: {
+            reps: { $ifNull: ['$exercises.sets.reps', 0] },
+            weight: { $ifNull: ['$exercises.sets.weight', 0] },
+            e1rm: '$exercises.sets.e1rm',
+          }},
         },
       },
       { $sort: { _id: 1 } },
     ]);
 
-    // Compute PR flags using a running maximum
-    let maxValue = 0;
+    let maxWeight = 0;
+    let maxE1rm = 0;
+
     return result.map((r) => {
-      const isPR = r.bestWeight > maxValue && r.bestWeight > 0;
-      if (isPR) maxValue = r.bestWeight;
-      return { date: r._id, value: r.bestWeight, isPR };
+      const isPR = r.bestWeight > maxWeight && r.bestWeight > 0;
+      if (isPR) maxWeight = r.bestWeight;
+
+      const bestE1rm = Math.round(r.bestE1rm * 10) / 10;
+      const isE1rmPR = bestE1rm > maxE1rm && bestE1rm > 0;
+      if (isE1rmPR) maxE1rm = bestE1rm;
+
+      // Find the set that produced the best e1RM
+      const bestSetData = r.sets.reduce(
+        (best: { reps: number; weight: number; e1rm: number } | null, s: { reps: number; weight: number; e1rm: number }) =>
+          (!best || s.e1rm > best.e1rm) ? s : best,
+        null,
+      );
+
+      const setsCount = bestSetData
+        ? r.sets.filter((s: { reps: number; weight: number }) =>
+            s.reps === bestSetData.reps && s.weight === bestSetData.weight
+          ).length
+        : 0;
+
+      return {
+        date: r._id,
+        value: r.bestWeight,
+        isPR,
+        e1rm: bestE1rm,
+        isE1rmPR,
+        bestSet: bestSetData ? {
+          reps: bestSetData.reps,
+          weight: bestSetData.weight,
+          setsCount,
+        } : null,
+      };
     });
   },
 };
