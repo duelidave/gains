@@ -44,6 +44,23 @@ export function toDisplaySet(set: ApiSet): DisplaySet {
   };
 }
 
+// Detect which columns to show based on actual set data
+export interface ExerciseColumns {
+  showReps: boolean;
+  showWeight: boolean;
+  showDuration: boolean;
+  showDistance: boolean;
+}
+
+export function detectColumns(sets: DisplaySet[]): ExerciseColumns {
+  return {
+    showReps: sets.some(s => s.reps > 0),
+    showWeight: sets.some(s => s.weight > 0),
+    showDuration: sets.some(s => (s.durationSeconds ?? 0) > 0),
+    showDistance: sets.some(s => (s.distance ?? 0) > 0),
+  };
+}
+
 // Map API exercise to display exercise
 export function toDisplayExercise(exercise: ApiExercise): DisplayExercise {
   const category = (exercise.category || 'strength') as 'strength' | 'cardio' | 'bodyweight';

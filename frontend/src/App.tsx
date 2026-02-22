@@ -10,6 +10,7 @@ import WorkoutDetail from './pages/WorkoutDetail';
 import Progress from './pages/Progress';
 import Profile from './pages/Profile';
 import WorkoutChat from './pages/WorkoutChat';
+import Plans from './pages/Plans';
 import { Skeleton } from './components/ui/Skeleton';
 import { Dumbbell } from 'lucide-react';
 
@@ -39,6 +40,7 @@ function AuthenticatedApp() {
             <Route path="/workouts" element={<Workouts />} />
             <Route path="/workouts/new" element={<WorkoutChat />} />
             <Route path="/workouts/:id" element={<WorkoutDetail />} />
+            <Route path="/plans" element={<Plans />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/profile" element={<Profile />} />
           </Route>

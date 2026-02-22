@@ -9,6 +9,7 @@ import type {
   TopExercise,
   ProgressPoint,
   PaginatedResponse,
+  TrainingPlan,
 } from '../types';
 
 const BASE = '/api';
@@ -49,6 +50,10 @@ export function getWorkouts(page = 1, limit = 10, dateFrom?: string, dateTo?: st
 
 export function getWorkout(id: string) {
   return request<Workout>(`/workouts/${id}`);
+}
+
+export function getWorkoutTitles() {
+  return request<string[]>('/workouts/titles');
 }
 
 export function getLatestWorkout(title: string) {
@@ -106,8 +111,9 @@ export function getProgress(exercise: string, period: string) {
 }
 
 // Exercises (autocomplete)
-export function getExerciseNames() {
-  return request<string[]>('/exercises');
+export function getExerciseNames(workoutTitle?: string) {
+  const params = workoutTitle ? `?workoutTitle=${encodeURIComponent(workoutTitle)}` : '';
+  return request<string[]>(`/exercises${params}`);
 }
 
 export function mergeExercises(from: string, to: string) {
@@ -115,6 +121,33 @@ export function mergeExercises(from: string, to: string) {
     method: 'POST',
     body: JSON.stringify({ from, to }),
   });
+}
+
+// Training Plans
+export function getPlans() {
+  return request<TrainingPlan[]>('/plans');
+}
+
+export function getPlan(id: string) {
+  return request<TrainingPlan>(`/plans/${id}`);
+}
+
+export function createPlan(data: Omit<TrainingPlan, '_id' | 'userId' | 'createdAt' | 'updatedAt'>) {
+  return request<TrainingPlan>('/plans', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export function updatePlan(id: string, data: Partial<Omit<TrainingPlan, '_id' | 'userId' | 'createdAt' | 'updatedAt'>>) {
+  return request<TrainingPlan>(`/plans/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export function deletePlan(id: string) {
+  return request<void>(`/plans/${id}`, { method: 'DELETE' });
 }
 
 // Settings

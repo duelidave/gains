@@ -4,6 +4,7 @@ import { AuthRequest } from '../types';
 import { sendProblem } from '../middleware/errorHandler';
 import { createWorkoutSchema, parseRequestSchema, validateBody } from '../validation/schemas';
 import { ExerciseService } from '../services/ExerciseService';
+import { TrainingPlan } from '../models/TrainingPlan';
 
 const router = Router();
 
@@ -25,43 +26,80 @@ ${namesList.map(n => `- "${n}"`).join('\n')}
 When the user types an exercise that matches one of these (even with different casing, spelling, abbreviation, singular/plural, or missing qualifiers like "(Maschine)" or "(KH)"), you MUST use the EXISTING name from the list above. Only create a new exercise name if it truly does not match any existing name.\n`
       : '';
 
-    const today = new Date().toISOString().split('T')[0];
+    // Load user's training plans for dynamic workout types
+    const plans = await TrainingPlan.find({ userId: req.user!.keycloakId });
 
-    const prompt = `You are a fitness workout parser. Parse the following gym workout messages into structured JSON.
-The user logs exercises one message at a time. The first message usually indicates the workout type.
-${exerciseNameSection}
-WORKOUT TYPES (title must be exactly one of these):
+    let workoutTypesSection: string;
+    let exerciseHintsSection = '';
+
+    if (plans.length > 0) {
+      const typeLines = plans.map(p => {
+        const exercises = p.sections.flatMap(s => s.exercises.map(e => e.name));
+        return `- "${p.workoutTitle}" — ${p.name} (${exercises.slice(0, 5).join(', ')}${exercises.length > 5 ? ', etc.' : ''})`;
+      }).join('\n');
+      const titles = plans.map(p => `"${p.workoutTitle}"`).join(', ');
+      workoutTypesSection = `WORKOUT TYPES (title must be exactly one of these):\n${typeLines}\n\nAlways map to exactly one of: ${titles} as the title.\nIf the workout type is unclear from context, infer it from the exercises.`;
+
+      // Build exercise hints from plan sections
+      const hints = plans.map(p => {
+        const sectionHints = p.sections.map(s =>
+          `  ${s.name}: ${s.exercises.map(e => `${e.name} (${e.setsReps})`).join(', ')}`
+        ).join('\n');
+        return `${p.name} (${p.workoutTitle}):\n${sectionHints}`;
+      }).join('\n');
+      exerciseHintsSection = `\nEXERCISE HINTS FROM TRAINING PLANS:\n${hints}\nUse these as reference for expected exercises and their typical sets/reps.\n`;
+    } else {
+      workoutTypesSection = `WORKOUT TYPES (title must be exactly one of these):
 - "Brust" — chest workouts (Bankdrücken, Fliegende, Butterfly, Dips, etc.)
 - "Rücken" — back workouts (Klimmzüge, Rudern, Latzug, Kreuzheben, etc.)
 - "Beine" — leg workouts (Kniebeugen, Beinpresse, Ausfallschritte, Wadenheben, etc.)
 
 The user may say things like "heute brust", "brust workout", "chest day", "rücken training", "leg day", "beine" etc.
 Always map to exactly one of: "Brust", "Rücken", "Beine" as the title.
-If the workout type is unclear from context, infer it from the exercises.
+If the workout type is unclear from context, infer it from the exercises.`;
+    }
 
-Rules:
-- Exercise names: use existing names from the list above when possible, otherwise keep the original name the user typed
-- "5x5 40kg" means 5 sets of 5 reps at 40kg
-- "3x8" without weight means 3 sets of 8 reps, weight: 0
-- "pro Hand" or "per hand" means weight_unit: "per_hand"
-- "pro Seite" or "per side" means weight_unit: "per_side"
-- "bodyweight" or "bw" means category: "bodyweight", weight: 0
-- Dropsets: "20/15/10kg 6+5+4" means 3 sets. Each set has type: "dropset", repsDisplay: "6+5+4", reps: 15 (total), weight_kg: [20,15,10], weight: 20 (max)
-- Duration exercises (cardio): "10min Rudermaschine" → category: "cardio", one set with duration_minutes: 10
-- rest_seconds if mentioned: "90s Pause" → rest_seconds: 90 on the preceding exercise
+    const today = new Date().toISOString().split('T')[0];
+
+    const prompt = `You are a fitness workout parser. Parse the following gym workout messages into structured JSON.
+The user logs exercises one message at a time. The first message usually indicates the workout type.
+${exerciseNameSection}
+${workoutTypesSection}
+${exerciseHintsSection}
+
+PARSING RULES:
+- Exercise names: use existing names from the list above when possible, otherwise keep the original name
+- "5x5 40kg" → 5 separate set objects each with reps: 5, weight: 40, unit: "kg"
+- "3x8" without weight → 3 sets of 8 reps, weight: 0
+- "pro Hand"/"per hand" → weight_unit: "per_hand". "pro Seite"/"per side" → weight_unit: "per_side"
+- "bodyweight"/"bw" → category: "bodyweight", weight: 0
+- Dropsets: "20/15/10kg 6+5+4" → 3 sets with type: "dropset", repsDisplay: "6+5+4", reps: 15 (total), weight_kg: [20,15,10], weight: 20 (max)
 - If no weight specified for a strength exercise, set weight to 0
-- Detect category: "strength" (default), "cardio" (has duration/minutes), "bodyweight" (explicitly stated or exercises like Dips, Klimmzüge, Liegestütze, Push-ups, Pull-ups without weight)
-- For each exercise, create individual set objects. "5x5 40kg" → 5 separate set objects each with reps: 5, weight: 40, unit: "kg"
+
+CATEGORIES:
+- "strength" (default): has reps + weight
+- "bodyweight": Dips, Klimmzüge, Liegestütze, Push-ups, Pull-ups without weight → reps only
+- "bodyweight" timed: Plank, Wall Sit, Hollow Hold, L-Sit, Dead Hang, Superman Hold → duration in seconds. "Plank 90s" → duration: 90. "Plank 1:30" → duration: 90. Do NOT multiply — "90s" = 90 seconds.
+- "cardio": has duration/distance. "10min Rudermaschine" → duration: 600 (seconds)
+
+NOTES AND CONTEXT — IMPORTANT:
+Any text in a user message that is NOT exercise name, sets, reps, or weight MUST be captured. Do not silently drop information.
+- Rest periods: "90s Pause", "2min Pause" → rest_seconds on that exercise (90, 120)
+- Exercise context: "pro Seite", "Stufe 3", "bei 3 eingehakt", "mit Pause oben" → exercise-level "notes" field
+- General comments: "hat sich schwer angefühlt", "Schulter zwickt" → exercise-level "notes" if about a specific exercise, otherwise workout-level "notes"
+- Multiple pieces of info: "Plank 90s mit 60s Pause" → duration: 90, rest_seconds: 60
 
 Return this exact JSON structure:
 {
   "title": "workout title from first message",
   "date": "${today}",
-  "notes": "",
+  "notes": "general workout comments if any",
   "exercises": [
     {
       "name": "Exercise Name",
       "category": "strength",
+      "notes": "any context the user mentioned for this exercise",
+      "rest_seconds": 90,
       "sets": [
         { "reps": 5, "weight": 40, "unit": "kg" }
       ]
@@ -69,14 +107,13 @@ Return this exact JSON structure:
   ]
 }
 
-For cardio exercises, sets look like:
-{ "duration": 600, "distance": 0, "distanceUnit": "km" }
-where duration is in seconds.
+Set formats by category:
+- strength: { "reps": 5, "weight": 40, "unit": "kg" }
+- bodyweight: { "reps": 10, "weight": 0, "unit": "kg" }
+- bodyweight timed: { "reps": 0, "weight": 0, "unit": "kg", "duration": 90 } (seconds, NOT minutes)
+- cardio: { "duration": 600, "distance": 2.5, "distanceUnit": "km" }
 
-For bodyweight exercises, sets look like:
-{ "reps": 10, "weight": 0, "unit": "kg" }
-
-Return ONLY valid JSON. No markdown fences, no explanation, no extra text.
+Return ONLY valid JSON. No markdown fences, no explanation.
 
 User messages:
 ${messages.map((m: string, i: number) => `${i + 1}. ${m}`).join('\n')}`;

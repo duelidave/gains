@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Dumbbell, TrendingUp, User } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, ClipboardList, TrendingUp, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
 import { hasChatSession } from '../lib/chatSession';
@@ -11,6 +11,7 @@ export function BottomNav() {
   const links = [
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard'), dot: false },
     { to: '/workouts', icon: Dumbbell, label: t('nav.workouts'), dot: hasSession },
+    { to: '/plans', icon: ClipboardList, label: t('nav.plans'), dot: false },
     { to: '/progress', icon: TrendingUp, label: t('nav.progress'), dot: false },
     { to: '/profile', icon: User, label: t('nav.profile'), dot: false },
   ];

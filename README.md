@@ -5,13 +5,10 @@
 > AI-powered workout tracking with natural language input. Built entirely by Claude.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.2.0-orange)](https://github.com/duelidave/gains/releases)
+[![Version](https://img.shields.io/github/v/release/duelidave/gains?color=orange)](https://github.com/duelidave/gains/releases)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](docker-compose.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Built by Claude](https://img.shields.io/badge/Built%20by-Claude-cc785c?logo=anthropic&logoColor=white)](https://claude.ai)
-
-![Dashboard](docs/screenshots/dashboard.png)
-*Screenshots coming soon*
 
 ---
 
@@ -29,6 +26,18 @@ GAINS is a self-hosted fitness tracker that lets you log workouts in natural lan
 - **Last workout reference** — see what you did last time while logging a new session
 - **Flexible auth** — local accounts, Keycloak, or any OIDC provider (Google, GitHub, Authentik, etc.)
 - **Self-hosted** — runs on your own hardware via Docker, your data stays yours
+
+## Supported Workout Types
+
+| Type | Examples | Tracked Data |
+|------|----------|-------------|
+| **Strength** | Bench Press, Squats, Deadlift | Sets x Reps @ Weight |
+| **Bodyweight** | Dips, Pull-ups, Push-ups | Sets x Reps |
+| **Timed** | Plank, Wall Sit, Dead Hang | Duration |
+| **Cardio** | Running, Swimming, Rowing | Duration + Distance |
+| **Flexibility** | Stretching, Yoga | Duration |
+
+All types support natural language input — just describe your workout and the AI parses it.
 
 ## Quick Start
 

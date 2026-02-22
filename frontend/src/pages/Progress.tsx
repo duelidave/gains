@@ -7,7 +7,7 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
-import { TrendingUp, Trophy, Search, GitMerge } from 'lucide-react';
+import { TrendingUp, Trophy, Search, GitMerge, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -16,7 +16,8 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Dialog, DialogTitle } from '../components/ui/Dialog';
 import { EmptyState } from '../components/EmptyState';
-import { getExerciseNames, getProgress, mergeExercises } from '../lib/api';
+import { useNavigate } from 'react-router-dom';
+import { getExerciseNames, getWorkoutTitles, getProgress, mergeExercises } from '../lib/api';
 import { useSettings } from '../context/SettingsContext';
 import { useTheme } from '../context/ThemeContext';
 import { convertWeight } from '../lib/units';
@@ -27,6 +28,7 @@ type ChartMode = 'weight' | 'e1rm';
 
 export default function Progress() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { settings } = useSettings();
   const { dark } = useTheme();
   const [exerciseNames, setExerciseNames] = useState<string[]>([]);
@@ -38,6 +40,8 @@ export default function Progress() {
   const [data, setData] = useState<ProgressPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingNames, setLoadingNames] = useState(true);
+  const [workoutTitles, setWorkoutTitles] = useState<string[]>([]);
+  const [titleFilter, setTitleFilter] = useState('');
   const [mergeFrom, setMergeFrom] = useState<string | null>(null);
   const [merging, setMerging] = useState(false);
 
@@ -49,15 +53,24 @@ export default function Progress() {
     color: dark ? '#fafafa' : '#18181b',
   };
 
-  const fetchNames = () => {
+  const fetchNames = (workoutTitle?: string) => {
     setLoadingNames(true);
-    getExerciseNames()
+    getExerciseNames(workoutTitle || undefined)
       .then(setExerciseNames)
       .catch(() => {})
       .finally(() => setLoadingNames(false));
   };
 
-  useEffect(fetchNames, []);
+  useEffect(() => {
+    getWorkoutTitles().then(setWorkoutTitles).catch(() => {});
+    fetchNames();
+  }, []);
+
+  useEffect(() => {
+    fetchNames(titleFilter);
+    setSelectedExercise('');
+    setSearchQuery('');
+  }, [titleFilter]);
 
   useEffect(() => {
     if (!selectedExercise) return;
@@ -96,7 +109,7 @@ export default function Progress() {
       await mergeExercises(mergeFrom, to);
       setMergeFrom(null);
       if (selectedExercise === mergeFrom) setSelectedExercise(to);
-      fetchNames();
+      fetchNames(titleFilter || undefined);
     } catch {
       // ignore
     } finally {
@@ -107,6 +120,35 @@ export default function Progress() {
   return (
     <div className="space-y-5 min-w-0 w-full">
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{t('progress.title')}</h1>
+
+      {/* Workout type filter */}
+      {workoutTitles.length > 1 && (
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => setTitleFilter('')}
+            className={`shrink-0 py-1.5 px-3 rounded-full text-xs font-medium transition-colors ${
+              !titleFilter
+                ? 'bg-blue-600 text-white'
+                : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+            }`}
+          >
+            {t('progress.all')}
+          </button>
+          {workoutTitles.map((title) => (
+            <button
+              key={title}
+              onClick={() => setTitleFilter(titleFilter === title ? '' : title)}
+              className={`shrink-0 py-1.5 px-3 rounded-full text-xs font-medium transition-colors ${
+                titleFilter === title
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+              }`}
+            >
+              {title}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Exercise search */}
       <div className="relative">
@@ -278,8 +320,15 @@ export default function Progress() {
               </div>
               <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
                 {prs.map((pr, i) => (
-                  <div key={i} className="flex items-center justify-between py-2.5">
-                    <span className="text-sm text-zinc-500 dark:text-zinc-400">{pr.date}</span>
+                  <div
+                    key={i}
+                    className={`flex items-center justify-between py-2.5 ${pr.workoutId ? 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 -mx-4 px-4 rounded-lg transition-colors' : ''}`}
+                    onClick={() => pr.workoutId && navigate(`/workouts/${pr.workoutId}?highlight=${encodeURIComponent(selectedExercise)}`)}
+                  >
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                      {pr.date}
+                      {pr.workoutId && <ExternalLink size={12} className="text-zinc-400" />}
+                    </span>
                     <Badge variant="warning">
                       <span className="tabular-nums font-bold">
                         {chartMode === 'e1rm' ? pr.e1rm : pr.value} {settings.weightUnit}
@@ -308,7 +357,11 @@ export default function Progress() {
                 </thead>
                 <tbody>
                   {[...dataConverted].reverse().map((point, i) => (
-                    <tr key={i} className="border-t border-zinc-200 dark:border-zinc-800">
+                    <tr
+                      key={i}
+                      className={`border-t border-zinc-200 dark:border-zinc-800 ${point.workoutId ? 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors' : ''}`}
+                      onClick={() => point.workoutId && navigate(`/workouts/${point.workoutId}?highlight=${encodeURIComponent(selectedExercise)}`)}
+                    >
                       <td className="py-2.5 pr-4 text-zinc-500 dark:text-zinc-400 tabular-nums">
                         {point.date.slice(5)}
                       </td>

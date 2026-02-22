@@ -3,6 +3,7 @@
     "dashboard": "Dashboard",
     "workouts": "Workouts",
     "progress": "Progress",
+    "plans": "Plans",
     "profile": "Profile"
   },
   "common": {
@@ -77,6 +78,8 @@
     "saving": "Saving...",
     "backToChat": "Back to Chat",
     "discard": "Start Over",
+    "planReference": "Plan: {{name}}",
+    "tapToAdd": "Tap an exercise to prefill",
     "lastWorkout": "Last {{title}} — {{date}}",
     "reps": "Reps",
     "weight": "Weight",
@@ -97,6 +100,7 @@
     "date": "Date",
     "sets": "Sets",
     "e1rm": "est. 1RM",
+    "all": "All",
     "mergeExercise": "Merge Exercise",
     "mergeInto": "Merge \"{{from}}\" into:"
   },
@@ -138,5 +142,33 @@
     "saving": "Saving...",
     "updateWorkout": "Update Workout",
     "saveWorkout": "Save Workout"
+  },
+  "plans": {
+    "title": "Plans",
+    "newPlan": "New Plan",
+    "editPlan": "Edit Plan",
+    "deletePlan": "Delete Plan",
+    "confirmDelete": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "failedToLoad": "Failed to load plans",
+    "failedToSave": "Failed to save plan",
+    "failedToDelete": "Failed to delete plan",
+    "noPlansYet": "No plans yet",
+    "noPlansDescription": "Create a training plan to customize your workout types",
+    "planName": "Plan Name",
+    "planNamePlaceholder": "e.g., Back & Biceps",
+    "workoutTitle": "Workout Title",
+    "workoutTitlePlaceholder": "e.g., Back",
+    "sections": "Sections",
+    "sectionName": "Section name",
+    "duration": "Duration",
+    "exerciseName": "Exercise name",
+    "setsReps": "Sets x Reps",
+    "rest": "Rest",
+    "restPlaceholder": "e.g., 3 Min",
+    "notesPlaceholder": "Notes",
+    "addExercise": "Add Exercise",
+    "addSection": "Add Section",
+    "progression": "Progression",
+    "progressionPlaceholder": "e.g., Add 5kg every 2 weeks"
   }
 }

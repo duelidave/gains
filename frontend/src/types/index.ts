@@ -77,6 +77,31 @@ export interface ProgressPoint {
   e1rm?: number;
   isE1rmPR?: boolean;
   bestSet?: { reps: number; weight: number; setsCount: number } | null;
+  workoutId?: string | null;
+}
+
+export interface PlanExercise {
+  name: string;
+  setsReps: string;
+  rest?: string;
+  notes?: string;
+}
+
+export interface PlanSection {
+  name: string;
+  duration?: string;
+  exercises: PlanExercise[];
+}
+
+export interface TrainingPlan {
+  _id: string;
+  userId: string;
+  name: string;
+  workoutTitle: string;
+  sections: PlanSection[];
+  progressionNotes?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaginatedResponse<T> {

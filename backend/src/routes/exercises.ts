@@ -5,10 +5,11 @@ import { mergeExercisesSchema, validateBody } from '../validation/schemas';
 
 const router = Router();
 
-// GET /api/exercises — unique exercise names for the user
+// GET /api/exercises — unique exercise names for the user (optionally filtered by workout title)
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    res.json(await ExerciseService.getNames(req.user!.keycloakId));
+    const workoutTitle = req.query.workoutTitle as string | undefined;
+    res.json(await ExerciseService.getNames(req.user!.keycloakId, workoutTitle));
   } catch (err) {
     next(err);
   }

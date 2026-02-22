@@ -22,3 +22,10 @@ export function formatDistance(value: number, from: 'km' | 'mi', to: 'km' | 'mi'
   const converted = convertDistance(value, from, to);
   return `${Number(converted.toFixed(2))} ${to}`;
 }
+
+export function formatDuration(totalSeconds: number): string {
+  if (totalSeconds < 60) return `${totalSeconds}s`;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}

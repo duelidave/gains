@@ -22,6 +22,7 @@ interface ProgressionPoint {
   e1rm: number;
   isE1rmPR: boolean;
   bestSet: { reps: number; weight: number; setsCount: number } | null;
+  workoutId: string | null;
 }
 
 export const ProgressService = {
@@ -44,6 +45,7 @@ export const ProgressService = {
           'exercises.name': { $regex: new RegExp(`^${escapeRegex(exerciseName)}$`, 'i') },
         },
       },
+      { $addFields: { workoutId: '$_id' } },
       { $unwind: '$exercises.sets' },
       {
         $addFields: {
@@ -73,6 +75,7 @@ export const ProgressService = {
             reps: { $ifNull: ['$exercises.sets.reps', 0] },
             weight: { $ifNull: ['$exercises.sets.weight', 0] },
             e1rm: '$exercises.sets.e1rm',
+            workoutId: '$workoutId',
           }},
         },
       },
@@ -92,7 +95,7 @@ export const ProgressService = {
 
       // Find the set that produced the best e1RM
       const bestSetData = r.sets.reduce(
-        (best: { reps: number; weight: number; e1rm: number } | null, s: { reps: number; weight: number; e1rm: number }) =>
+        (best: { reps: number; weight: number; e1rm: number; workoutId: unknown } | null, s: { reps: number; weight: number; e1rm: number; workoutId: unknown }) =>
           (!best || s.e1rm > best.e1rm) ? s : best,
         null,
       );
@@ -114,6 +117,7 @@ export const ProgressService = {
           weight: bestSetData.weight,
           setsCount,
         } : null,
+        workoutId: bestSetData?.workoutId ? bestSetData.workoutId.toString() : null,
       };
     });
   },

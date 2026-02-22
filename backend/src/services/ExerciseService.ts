@@ -1,9 +1,12 @@
 import { Workout } from '../models/Workout';
 
 export const ExerciseService = {
-  async getNames(userId: string): Promise<string[]> {
+  async getNames(userId: string, workoutTitle?: string): Promise<string[]> {
+    const match: Record<string, unknown> = { userId };
+    if (workoutTitle) match.title = workoutTitle;
+
     const result = await Workout.aggregate([
-      { $match: { userId } },
+      { $match: match },
       { $unwind: '$exercises' },
       { $group: { _id: '$exercises.name' } },
       { $sort: { _id: 1 } },

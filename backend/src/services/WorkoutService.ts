@@ -37,6 +37,11 @@ export const WorkoutService = {
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   },
 
+  async getDistinctTitles(userId: string): Promise<string[]> {
+    const titles = await Workout.distinct('title', { userId });
+    return titles.sort();
+  },
+
   async getById(userId: string, id: string): Promise<IWorkout> {
     const workout = await Workout.findOne({ _id: id, userId });
     if (!workout) throw new ApiError(404, 'Workout not found');

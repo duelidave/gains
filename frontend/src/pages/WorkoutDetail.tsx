@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/Card';
@@ -10,8 +10,8 @@ import { Skeleton } from '../components/ui/Skeleton';
 import WorkoutForm from './WorkoutForm';
 import { getWorkout, updateWorkout, deleteWorkout } from '../lib/api';
 import { useSettings } from '../context/SettingsContext';
-import { formatWeight, formatDistance } from '../lib/units';
-import { toDisplayExercise } from '../lib/mappers';
+import { formatWeight, formatDistance, formatDuration } from '../lib/units';
+import { toDisplayExercise, detectColumns } from '../lib/mappers';
 import type { Workout, WorkoutInput } from '../types';
 import { formatDate } from '../lib/date';
 
@@ -26,6 +26,9 @@ export default function WorkoutDetail() {
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [searchParams] = useSearchParams();
+  const highlightExercise = searchParams.get('highlight');
+  const highlightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -34,6 +37,15 @@ export default function WorkoutDetail() {
       .catch(() => setError(t('workoutDetail.failedToLoad')))
       .finally(() => setLoading(false));
   }, [id, t]);
+
+  // Auto-scroll to highlighted exercise
+  useEffect(() => {
+    if (highlightExercise && highlightRef.current && !loading) {
+      setTimeout(() => {
+        highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [highlightExercise, loading]);
 
   // Map API exercises to display exercises
   const displayExercises = useMemo(
@@ -142,72 +154,79 @@ export default function WorkoutDetail() {
 
       {/* Exercises */}
       <div className="space-y-3">
-        {displayExercises.map((exercise, idx) => (
-          <Card key={idx}>
+        {displayExercises.map((exercise, idx) => {
+          const isHighlighted = highlightExercise?.toLowerCase() === exercise.name.toLowerCase();
+          return (
+          <div key={idx} ref={isHighlighted ? highlightRef : undefined}>
+          <Card className={isHighlighted ? 'ring-2 ring-yellow-500/50 border-yellow-500/30' : ''}>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-medium text-zinc-900 dark:text-zinc-50">{exercise.name}</h3>
               <Badge>{exercise.category}</Badge>
             </div>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-zinc-600 dark:text-zinc-500 text-xs uppercase tracking-wide">
-                  <th className="text-left py-2 pr-4 font-medium">#</th>
-                  {(exercise.category === 'strength' ||
-                    exercise.category === 'bodyweight') && (
-                    <th className="text-left py-2 pr-4 font-medium">{t('workoutDetail.reps')}</th>
-                  )}
-                  {exercise.category === 'strength' && (
-                    <th className="text-left py-2 pr-4 font-medium">{t('workoutDetail.weight')}</th>
-                  )}
-                  {exercise.category === 'cardio' && (
-                    <th className="text-left py-2 pr-4 font-medium">{t('workoutDetail.duration')}</th>
-                  )}
-                  {exercise.category === 'cardio' && (
-                    <th className="text-left py-2 font-medium">{t('workoutDetail.distance')}</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {exercise.sets.map((set, si) => (
-                  <tr key={si} className="border-t border-zinc-200 dark:border-zinc-800">
-                    <td className="py-2 pr-4 text-zinc-600 dark:text-zinc-500 tabular-nums">{si + 1}</td>
-                    {(exercise.category === 'strength' ||
-                      exercise.category === 'bodyweight') && (
-                      <td className="py-2 pr-4 text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
-                        {set.isDropset && set.repsDisplay
-                          ? set.repsDisplay
-                          : set.reps || '-'}
-                      </td>
+            {exercise.notes && <p className="text-xs text-zinc-500 dark:text-zinc-400 italic mb-3">{exercise.notes}</p>}
+            {(() => {
+              const cols = detectColumns(exercise.sets);
+              return (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-zinc-600 dark:text-zinc-500 text-xs uppercase tracking-wide">
+                    <th className="text-left py-2 pr-4 font-medium">#</th>
+                    {cols.showReps && (
+                      <th className="text-left py-2 pr-4 font-medium">{t('workoutDetail.reps')}</th>
                     )}
-                    {exercise.category === 'strength' && (
-                      <td className="py-2 pr-4 text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
-                        {set.weight > 0
-                          ? formatWeight(set.weight, set.unit as 'kg' | 'lbs', settings.weightUnit)
-                          : '-'}
-                      </td>
+                    {cols.showWeight && (
+                      <th className="text-left py-2 pr-4 font-medium">{t('workoutDetail.weight')}</th>
                     )}
-                    {exercise.category === 'cardio' && (
-                      <td className="py-2 pr-4 text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
-                        {set.durationSeconds != null
-                          ? set.durationSeconds >= 60
-                            ? `${Math.floor(set.durationSeconds / 60)}min ${set.durationSeconds % 60 > 0 ? `${set.durationSeconds % 60}s` : ''}`
-                            : `${set.durationSeconds}s`
-                          : '-'}
-                      </td>
+                    {cols.showDuration && (
+                      <th className="text-left py-2 pr-4 font-medium">{t('workoutDetail.duration')}</th>
                     )}
-                    {exercise.category === 'cardio' && (
-                      <td className="py-2 text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
-                        {set.distance != null
-                          ? formatDistance(set.distance, (set.distanceUnit || 'km') as 'km' | 'mi', settings.distanceUnit)
-                          : '-'}
-                      </td>
+                    {cols.showDistance && (
+                      <th className="text-left py-2 font-medium">{t('workoutDetail.distance')}</th>
                     )}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {exercise.sets.map((set, si) => (
+                    <tr key={si} className="border-t border-zinc-200 dark:border-zinc-800">
+                      <td className="py-2 pr-4 text-zinc-600 dark:text-zinc-500 tabular-nums">{si + 1}</td>
+                      {cols.showReps && (
+                        <td className="py-2 pr-4 text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
+                          {set.isDropset && set.repsDisplay
+                            ? set.repsDisplay
+                            : set.reps || '-'}
+                        </td>
+                      )}
+                      {cols.showWeight && (
+                        <td className="py-2 pr-4 text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
+                          {set.weight > 0
+                            ? formatWeight(set.weight, set.unit as 'kg' | 'lbs', settings.weightUnit)
+                            : '-'}
+                        </td>
+                      )}
+                      {cols.showDuration && (
+                        <td className="py-2 pr-4 text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
+                          {set.durationSeconds != null && set.durationSeconds > 0
+                            ? formatDuration(set.durationSeconds)
+                            : '-'}
+                        </td>
+                      )}
+                      {cols.showDistance && (
+                        <td className="py-2 text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
+                          {set.distance != null
+                            ? formatDistance(set.distance, (set.distanceUnit || 'km') as 'km' | 'mi', settings.distanceUnit)
+                            : '-'}
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              );
+            })()}
           </Card>
-        ))}
+          </div>
+          );
+        })}
       </div>
 
       {/* Delete Confirmation */}

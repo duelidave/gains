@@ -72,6 +72,35 @@ export const mergeExercisesSchema = z.object({
   to: z.string().min(1, 'Target exercise name is required'),
 });
 
+// ---------- Training plan schemas ----------
+
+const planExerciseSchema = z.object({
+  name: z.string().min(1, 'Exercise name is required'),
+  setsReps: z.string().min(1, 'Sets/reps is required'),
+  rest: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+const planSectionSchema = z.object({
+  name: z.string().min(1, 'Section name is required'),
+  duration: z.string().optional(),
+  exercises: z.array(planExerciseSchema).min(1, 'At least one exercise is required'),
+});
+
+export const createPlanSchema = z.object({
+  name: z.string().min(1, 'Plan name is required'),
+  workoutTitle: z.string().min(1, 'Workout title is required'),
+  sections: z.array(planSectionSchema).min(1, 'At least one section is required'),
+  progressionNotes: z.string().optional(),
+});
+
+export const updatePlanSchema = z.object({
+  name: z.string().min(1, 'Plan name is required').optional(),
+  workoutTitle: z.string().min(1, 'Workout title is required').optional(),
+  sections: z.array(planSectionSchema).optional(),
+  progressionNotes: z.string().optional(),
+});
+
 // ---------- Validation middleware factory ----------
 
 export function validateBody(schema: z.ZodSchema) {

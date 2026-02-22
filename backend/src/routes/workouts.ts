@@ -31,6 +31,15 @@ router.post('/', validateBody(createWorkoutSchema), async (req: AuthRequest, res
   }
 });
 
+// Distinct workout titles for filter chips
+router.get('/titles', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    res.json(await WorkoutService.getDistinctTitles(req.user!.keycloakId));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Get latest workout by title (for reference during new workout)
 router.get('/latest', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

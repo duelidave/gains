@@ -3,6 +3,7 @@
     "dashboard": "Dashboard",
     "workouts": "Workouts",
     "progress": "Fortschritt",
+    "plans": "Pläne",
     "profile": "Profil"
   },
   "common": {
@@ -77,6 +78,8 @@
     "saving": "Speichern...",
     "backToChat": "Zurück zum Chat",
     "discard": "Neu beginnen",
+    "planReference": "Plan: {{name}}",
+    "tapToAdd": "Übung antippen zum Ausfüllen",
     "lastWorkout": "Letztes {{title}} — {{date}}",
     "reps": "Wdh.",
     "weight": "Gewicht",
@@ -97,6 +100,7 @@
     "date": "Datum",
     "sets": "Sätze",
     "e1rm": "gesch. 1RM",
+    "all": "Alle",
     "mergeExercise": "Übung zusammenführen",
     "mergeInto": "\"{{from}}\" zusammenführen mit:"
   },
@@ -138,5 +142,33 @@
     "saving": "Speichern...",
     "updateWorkout": "Workout aktualisieren",
     "saveWorkout": "Workout speichern"
+  },
+  "plans": {
+    "title": "Pläne",
+    "newPlan": "Neuer Plan",
+    "editPlan": "Plan bearbeiten",
+    "deletePlan": "Plan löschen",
+    "confirmDelete": "Bist du sicher, dass du \"{{name}}\" löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "failedToLoad": "Pläne konnten nicht geladen werden",
+    "failedToSave": "Plan konnte nicht gespeichert werden",
+    "failedToDelete": "Plan konnte nicht gelöscht werden",
+    "noPlansYet": "Noch keine Pläne",
+    "noPlansDescription": "Erstelle einen Trainingsplan, um deine Workout-Typen anzupassen",
+    "planName": "Planname",
+    "planNamePlaceholder": "z.B. Rücken & Bizeps",
+    "workoutTitle": "Workout-Titel",
+    "workoutTitlePlaceholder": "z.B. Rücken",
+    "sections": "Abschnitte",
+    "sectionName": "Abschnittsname",
+    "duration": "Dauer",
+    "exerciseName": "Übungsname",
+    "setsReps": "Sätze x Wdh.",
+    "rest": "Pause",
+    "restPlaceholder": "z.B. 3 Min",
+    "notesPlaceholder": "Notizen",
+    "addExercise": "Übung hinzufügen",
+    "addSection": "Abschnitt hinzufügen",
+    "progression": "Progression",
+    "progressionPlaceholder": "z.B. Alle 2 Wochen 5kg erhöhen"
   }
 }
