@@ -1,6 +1,6 @@
 {
   "name": "gains-backend",
-  "version": "0.1.0-beta",
+  "version": "0.3.1",
   "private": true,
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
