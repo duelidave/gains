@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, Dumbbell, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/Card';
@@ -15,9 +15,10 @@ import { hasChatSession } from '../lib/chatSession';
 export default function Workouts() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
   const hasSession = hasChatSession();
@@ -39,6 +40,14 @@ export default function Workouts() {
   useEffect(() => {
     fetchWorkouts();
   }, [fetchWorkouts]);
+
+  useEffect(() => {
+    if (page > 1) {
+      setSearchParams({ page: String(page) }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }, [page, setSearchParams]);
 
   const getTotalSets = (w: Workout) =>
     w.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);

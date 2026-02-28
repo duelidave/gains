@@ -16,7 +16,7 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Dialog, DialogTitle } from '../components/ui/Dialog';
 import { EmptyState } from '../components/EmptyState';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getExerciseNames, getWorkoutTitles, getProgress, mergeExercises } from '../lib/api';
 import { useSettings } from '../context/SettingsContext';
 import { useTheme } from '../context/ThemeContext';
@@ -29,19 +29,20 @@ type ChartMode = 'weight' | 'e1rm';
 export default function Progress() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { settings } = useSettings();
   const { dark } = useTheme();
   const [exerciseNames, setExerciseNames] = useState<string[]>([]);
-  const [selectedExercise, setSelectedExercise] = useState('');
+  const [selectedExercise, setSelectedExercise] = useState(searchParams.get('exercise') || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  const [period, setPeriod] = useState<string>('3M');
-  const [chartMode, setChartMode] = useState<ChartMode>('weight');
+  const [period, setPeriod] = useState<string>(searchParams.get('period') || '3M');
+  const [chartMode, setChartMode] = useState<ChartMode>((searchParams.get('mode') as ChartMode) || 'weight');
   const [data, setData] = useState<ProgressPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingNames, setLoadingNames] = useState(true);
   const [workoutTitles, setWorkoutTitles] = useState<string[]>([]);
-  const [titleFilter, setTitleFilter] = useState('');
+  const [titleFilter, setTitleFilter] = useState(searchParams.get('title') || '');
   const [mergeFrom, setMergeFrom] = useState<string | null>(null);
   const [merging, setMerging] = useState(false);
 
@@ -61,15 +62,27 @@ export default function Progress() {
       .finally(() => setLoadingNames(false));
   };
 
+  // Sync state to URL search params
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedExercise) params.set('exercise', selectedExercise);
+    if (period !== '3M') params.set('period', period);
+    if (chartMode !== 'weight') params.set('mode', chartMode);
+    if (titleFilter) params.set('title', titleFilter);
+    setSearchParams(params, { replace: true });
+  }, [selectedExercise, period, chartMode, titleFilter, setSearchParams]);
+
   useEffect(() => {
     getWorkoutTitles().then(setWorkoutTitles).catch(() => {});
-    fetchNames();
+    fetchNames(searchParams.get('title') || undefined);
   }, []);
 
   useEffect(() => {
     fetchNames(titleFilter);
-    setSelectedExercise('');
-    setSearchQuery('');
+    if (!searchParams.get('exercise')) {
+      setSelectedExercise('');
+      setSearchQuery('');
+    }
   }, [titleFilter]);
 
   useEffect(() => {

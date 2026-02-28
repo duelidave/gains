@@ -123,12 +123,12 @@ export default function WorkoutDetail() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link
-          to="/workouts"
+        <button
+          onClick={() => navigate(-1)}
           className="w-9 h-9 rounded-lg flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
         >
           <ArrowLeft size={18} />
-        </Link>
+        </button>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-50 truncate">{workout.title}</h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
