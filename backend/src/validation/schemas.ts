@@ -36,10 +36,10 @@ const exerciseSchema = z.object({
 
 export const createWorkoutSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  date: z.string().optional(),
-  notes: z.string().optional().default(''),
+  date: z.string().nullable().optional(),
+  notes: z.string().nullable().optional().default(''),
   exercises: z.array(exerciseSchema).default([]),
-  duration: z.number().min(0).optional().default(0),
+  duration: z.number().min(0).nullable().optional().default(0),
 });
 
 export const updateWorkoutSchema = z.object({

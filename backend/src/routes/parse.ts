@@ -92,7 +92,6 @@ Any text in a user message that is NOT exercise name, sets, reps, or weight MUST
 Return this exact JSON structure:
 {
   "title": "workout title from first message",
-  "date": "${today}",
   "notes": "general workout comments if any",
   "exercises": [
     {
@@ -129,6 +128,11 @@ ${messages.map((m: string, i: number) => `${i + 1}. ${m}`).join('\n')}`;
     // Parse the JSON response, stripping any accidental markdown fences
     const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const rawParsed = JSON.parse(cleaned);
+
+    // Server sets the date — don't rely on the LLM for this
+    rawParsed.date = today;
+    // Normalise null notes to empty string
+    if (rawParsed.notes == null) rawParsed.notes = '';
 
     // Validate LLM output against workout schema before returning
     const validated = createWorkoutSchema.safeParse(rawParsed);
