@@ -1,0 +1,13 @@
+# Local dev builds — does NOT overwrite ghcr.io images.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml build
+#        docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+services:
+  backend:
+    image: gains-backend:dev
+    build:
+      context: ./backend
+
+  frontend:
+    image: gains-frontend:dev
+    build:
+      context: ./frontend
