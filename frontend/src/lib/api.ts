@@ -150,6 +150,20 @@ export function deletePlan(id: string) {
   return request<void>(`/plans/${id}`, { method: 'DELETE' });
 }
 
+export interface GeneratePlanRequest {
+  prompt: string;
+  existingPlanId?: string;
+}
+
+export type GeneratePlanResponse = Omit<TrainingPlan, '_id' | 'userId' | 'createdAt' | 'updatedAt'>;
+
+export function generatePlan(data: GeneratePlanRequest) {
+  return request<GeneratePlanResponse>('/plans/generate', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 // Settings
 export function getSettings() {
   return request<UserSettings>('/settings');

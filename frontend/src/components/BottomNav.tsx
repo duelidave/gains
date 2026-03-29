@@ -10,7 +10,7 @@ export function BottomNav() {
 
   const links = [
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard'), dot: false },
-    { to: '/workouts', icon: Dumbbell, label: t('nav.workouts'), dot: hasSession },
+    { to: hasSession ? '/workouts/new' : '/workouts', icon: Dumbbell, label: t('nav.workouts'), dot: hasSession },
     { to: '/plans', icon: ClipboardList, label: t('nav.plans'), dot: false },
     { to: '/progress', icon: TrendingUp, label: t('nav.progress'), dot: false },
     { to: '/profile', icon: User, label: t('nav.profile'), dot: false },
@@ -18,30 +18,28 @@ export function BottomNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-zinc-100 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800"
+      className="md:hidden fixed bottom-0 w-full z-50 rounded-t-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex justify-around items-center h-20 px-2"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      <div className="flex justify-around">
-        {links.map(({ to, icon: Icon, label, dot }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              cn(
-                'flex flex-col items-center gap-0.5 py-2.5 px-3 text-[10px] font-medium min-w-[64px]',
-                isActive ? 'text-blue-500' : 'text-zinc-600 dark:text-zinc-500'
-              )
-            }
-          >
-            <span className="relative">
-              <Icon size={20} />
-              {dot && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-blue-500" />}
-            </span>
-            <span>{label}</span>
-          </NavLink>
-        ))}
-      </div>
+      {links.map(({ to, icon: Icon, label, dot }) => (
+        <NavLink
+          key={to}
+          to={to}
+          end={to === '/'}
+          className={({ isActive }) =>
+            cn(
+              'flex flex-col items-center justify-center transition-all active:scale-90 duration-200',
+              isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-300'
+            )
+          }
+        >
+          <span className="relative mb-1">
+            <Icon size={20} />
+            {dot && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-indigo-500" />}
+          </span>
+          <span className="text-[10px] font-medium tracking-wide">{label}</span>
+        </NavLink>
+      ))}
     </nav>
   );
 }

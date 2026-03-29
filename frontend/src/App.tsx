@@ -17,10 +17,10 @@ import { Dumbbell } from 'lucide-react';
 function LoadingScreen() {
   const { t } = useTranslation();
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-zinc-950 gap-4">
-      <Dumbbell size={48} className="text-blue-500 animate-pulse" />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-950 gap-4">
+      <Dumbbell size={48} className="text-indigo-500 animate-pulse" />
       <Skeleton className="h-4 w-48" />
-      <p className="text-zinc-500 dark:text-zinc-400 text-sm">{t('common.connecting')}</p>
+      <p className="text-slate-500 dark:text-slate-400 text-sm">{t('common.connecting')}</p>
     </div>
   );
 }

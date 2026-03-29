@@ -1,10 +1,10 @@
-import { LogOut, Mail, Moon, Sun } from 'lucide-react';
+import { AlertTriangle, Globe, LogOut, Moon, Ruler, Scale, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { useAuth } from '../auth/AuthProvider';
 import { useSettings } from '../context/SettingsContext';
 import { useTheme } from '../context/ThemeContext';
+
+const APP_VERSION = '0.3.1';
 
 function SegmentedControl({
   value,
@@ -16,15 +16,15 @@ function SegmentedControl({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="flex rounded-lg bg-zinc-200 dark:bg-zinc-800 p-0.5 gap-0.5">
+    <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-lg">
       {options.map((opt) => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors ${
+          className={`flex-1 py-1.5 px-3 text-sm rounded-md transition-colors ${
             value === opt.value
-              ? 'bg-blue-600 text-white'
-              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+              ? 'font-bold bg-indigo-600 text-white shadow-lg'
+              : 'font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
           }`}
         >
           {opt.label}
@@ -34,9 +34,70 @@ function SegmentedControl({
   );
 }
 
+function LanguageSelector({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="flex gap-2">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          onClick={() => onChange(opt.value)}
+          className={`text-xs font-bold py-1 px-2 rounded transition-colors ${
+            value === opt.value
+              ? 'text-indigo-400 bg-indigo-400/10 ring-1 ring-indigo-400/30'
+              : 'text-slate-500 bg-slate-100 dark:bg-slate-950 hover:text-slate-700 dark:hover:text-slate-300'
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function SettingRow({
+  icon,
+  label,
+  description,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-white dark:bg-slate-900/50 rounded-xl p-4 flex items-center justify-between border border-slate-200 dark:border-slate-800">
+      <div className="flex items-center gap-3">
+        {icon}
+        <div>
+          <p className="font-medium text-slate-900 dark:text-slate-100">{label}</p>
+          {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 px-1">
+      {children}
+    </h3>
+  );
+}
+
 export default function Profile() {
   const { t } = useTranslation();
-  const { fullName, email, username, logout } = useAuth();
+  const { fullName, username, logout } = useAuth();
   const { settings, updateSettings } = useSettings();
   const { dark } = useTheme();
 
@@ -50,124 +111,117 @@ export default function Profile() {
     : '??';
 
   return (
-    <div className="space-y-5">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{t('profile.title')}</h1>
-
-      <div className="space-y-4 max-w-2xl">
-        {/* User Info */}
-        <Card>
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-blue-600/20 flex items-center justify-center shrink-0">
-              <span className="text-blue-500 font-bold text-lg">{initials}</span>
-            </div>
-            <div className="min-w-0">
-              <p className="text-lg font-bold text-zinc-900 dark:text-zinc-50 truncate">{fullName}</p>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate">@{username}</p>
-            </div>
+    <div className="space-y-6 max-w-2xl mx-auto pb-8">
+      {/* User Section */}
+      <section className="flex flex-col items-center py-6">
+        <div className="relative w-24 h-24 mb-4">
+          <div className="w-full h-full rounded-full overflow-hidden border-2 border-indigo-500/30 p-1 flex items-center justify-center bg-slate-50 dark:bg-slate-900/50">
+            <span className="text-indigo-400 font-bold text-2xl">{initials}</span>
           </div>
-          {email && (
-            <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-              <div className="flex items-center gap-3 text-sm">
-                <Mail size={15} className="text-zinc-400 dark:text-zinc-500 shrink-0" />
-                <span className="text-zinc-500 dark:text-zinc-400 truncate">{email}</span>
-              </div>
-            </div>
-          )}
-        </Card>
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{fullName}</h2>
+        <p className="text-slate-500 text-sm font-medium">@{username}</p>
+      </section>
 
-        {/* Settings */}
-        <Card className="space-y-5">
-          <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{t('profile.preferences')}</p>
+      {/* Appearance */}
+      <section className="space-y-3">
+        <SectionHeader>{t('profile.preferences')}</SectionHeader>
 
-          {/* Dark mode toggle */}
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{t('profile.darkMode')}</p>
-              <p className="text-xs text-zinc-600 dark:text-zinc-500">{t('profile.darkModeDescription')}</p>
+        <SettingRow
+          icon={dark ? <Moon size={18} className="text-indigo-400" /> : <Sun size={18} className="text-indigo-400" />}
+          label={t('profile.darkMode')}
+          description={t('profile.darkModeDescription')}
+        >
+          <button
+            onClick={() => updateSettings({ darkMode: !dark })}
+            className={`w-12 h-6 rounded-full relative flex items-center px-1 transition-colors ${
+              dark ? 'bg-indigo-600' : 'bg-slate-700'
+            }`}
+          >
+            <div
+              className={`absolute w-4 h-4 bg-white rounded-full shadow-sm transition-all ${
+                dark ? 'right-1' : 'left-1'
+              }`}
+            />
+          </button>
+        </SettingRow>
+
+        <SettingRow
+          icon={<Globe size={18} className="text-indigo-400" />}
+          label={t('profile.language')}
+          description={t('profile.languageDescription')}
+        >
+          <LanguageSelector
+            value={settings.language}
+            options={[
+              { value: 'de', label: 'DE' },
+              { value: 'en', label: 'EN' },
+            ]}
+            onChange={(v) => updateSettings({ language: v as 'en' | 'de' })}
+          />
+        </SettingRow>
+      </section>
+
+      {/* Units */}
+      <section className="space-y-3">
+        <SectionHeader>Units</SectionHeader>
+
+        <SettingRow
+          icon={<Scale size={18} className="text-indigo-400" />}
+          label={t('profile.weightUnit')}
+          description={t('profile.weightUnitDescription', { unit: settings.weightUnit })}
+        >
+          <SegmentedControl
+            value={settings.weightUnit}
+            options={[
+              { value: 'kg', label: 'kg' },
+              { value: 'lbs', label: 'lbs' },
+            ]}
+            onChange={(v) => updateSettings({ weightUnit: v as 'kg' | 'lbs' })}
+          />
+        </SettingRow>
+
+        <SettingRow
+          icon={<Ruler size={18} className="text-indigo-400" />}
+          label={t('profile.distanceUnit')}
+          description={t('profile.distanceUnitDescription', { unit: settings.distanceUnit })}
+        >
+          <SegmentedControl
+            value={settings.distanceUnit}
+            options={[
+              { value: 'km', label: 'km' },
+              { value: 'mi', label: 'mi' },
+            ]}
+            onChange={(v) => updateSettings({ distanceUnit: v as 'km' | 'mi' })}
+          />
+        </SettingRow>
+      </section>
+
+      {/* Danger Zone */}
+      <section className="space-y-3">
+        <SectionHeader>{t('profile.signOut')}</SectionHeader>
+
+        <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl space-y-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle size={18} className="text-red-500 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-bold text-red-500">{t('profile.signOut')}</p>
+              <p className="text-[11px] text-red-500/70">{t('profile.signOutDescription')}</p>
             </div>
             <button
-              onClick={() => updateSettings({ darkMode: !dark })}
-              className={`relative w-12 h-7 rounded-full transition-colors ${
-                dark ? 'bg-blue-600' : 'bg-zinc-300'
-              }`}
+              onClick={logout}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors border border-red-500/20"
             >
-              <div
-                className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-transform flex items-center justify-center ${
-                  dark ? 'translate-x-5.5' : 'translate-x-0.5'
-                }`}
-              >
-                {dark ? <Moon size={12} className="text-blue-600" /> : <Sun size={12} className="text-amber-500" />}
-              </div>
+              <LogOut size={14} />
+              {t('profile.signOut')}
             </button>
           </div>
+        </div>
+      </section>
 
-          <div className="border-t border-zinc-200 dark:border-zinc-800" />
-
-          {/* Language */}
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{t('profile.language')}</p>
-              <p className="text-xs text-zinc-600 dark:text-zinc-500">{t('profile.languageDescription')}</p>
-            </div>
-            <SegmentedControl
-              value={settings.language}
-              options={[
-                { value: 'en', label: 'EN' },
-                { value: 'de', label: 'DE' },
-              ]}
-              onChange={(v) => updateSettings({ language: v as 'en' | 'de' })}
-            />
-          </div>
-
-          <div className="border-t border-zinc-200 dark:border-zinc-800" />
-
-          {/* Weight unit */}
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{t('profile.weightUnit')}</p>
-              <p className="text-xs text-zinc-600 dark:text-zinc-500">{t('profile.weightUnitDescription', { unit: settings.weightUnit })}</p>
-            </div>
-            <SegmentedControl
-              value={settings.weightUnit}
-              options={[
-                { value: 'kg', label: 'kg' },
-                { value: 'lbs', label: 'lbs' },
-              ]}
-              onChange={(v) => updateSettings({ weightUnit: v as 'kg' | 'lbs' })}
-            />
-          </div>
-
-          <div className="border-t border-zinc-200 dark:border-zinc-800" />
-
-          {/* Distance unit */}
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{t('profile.distanceUnit')}</p>
-              <p className="text-xs text-zinc-600 dark:text-zinc-500">{t('profile.distanceUnitDescription', { unit: settings.distanceUnit })}</p>
-            </div>
-            <SegmentedControl
-              value={settings.distanceUnit}
-              options={[
-                { value: 'km', label: 'km' },
-                { value: 'mi', label: 'mi' },
-              ]}
-              onChange={(v) => updateSettings({ distanceUnit: v as 'km' | 'mi' })}
-            />
-          </div>
-        </Card>
-
-        {/* Logout */}
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{t('profile.signOut')}</p>
-              <p className="text-xs text-zinc-600 dark:text-zinc-500">{t('profile.signOutDescription')}</p>
-            </div>
-            <Button variant="default" size="sm" onClick={logout}>
-              <LogOut size={14} /> {t('profile.signOut')}
-            </Button>
-          </div>
-        </Card>
+      {/* Footer */}
+      <div className="flex justify-center pt-2">
+        <p className="text-[11px] font-medium text-slate-600">App Version {APP_VERSION}</p>
       </div>
     </div>
   );

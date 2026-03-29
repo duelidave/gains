@@ -138,7 +138,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
       {/* Exercises */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{t('workoutForm.exercises')}</h3>
+          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-50">{t('workoutForm.exercises')}</h3>
           <Button type="button" variant="ghost" size="sm" onClick={addExercise}>
             <Plus size={14} /> {t('workoutForm.addExercise')}
           </Button>
@@ -164,12 +164,12 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
                   {activeAutocomplete === exIdx &&
                     exercise.name.length > 0 &&
                     filteredSuggestions(exercise.name).length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 shadow-xl overflow-hidden">
+                      <div className="absolute z-10 w-full mt-1 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
                         {filteredSuggestions(exercise.name).map((s) => (
                           <button
                             key={s}
                             type="button"
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-50"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-slate-50"
                             onMouseDown={() => {
                               updateExercise(exIdx, { name: s });
                               setActiveAutocomplete(null);
@@ -201,7 +201,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
               <button
                 type="button"
                 onClick={() => removeExercise(exIdx)}
-                className="w-9 h-9 mt-6 rounded-lg flex items-center justify-center text-zinc-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                className="w-9 h-9 mt-6 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors"
                 disabled={exercises.length <= 1}
               >
                 <Trash2 size={15} />
@@ -211,7 +211,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
             {/* Sets */}
             <div className="space-y-2">
               {/* Set headers */}
-              <div className="flex items-center gap-2 text-[10px] text-zinc-600 dark:text-zinc-500 font-medium uppercase tracking-widest px-1">
+              <div className="flex items-center gap-2 text-[10px] text-slate-600 dark:text-slate-500 font-medium uppercase tracking-widest px-1">
                 <span className="w-8">{t('workoutForm.set')}</span>
                 {categoryFields[exercise.category || 'strength']?.includes('reps') && (
                   <span className="flex-1">{t('workoutForm.reps')}</span>
@@ -230,7 +230,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
 
               {exercise.sets.map((set, setIdx) => (
                 <div key={setIdx} className="flex items-center gap-2">
-                  <span className="w-8 text-xs text-zinc-600 dark:text-zinc-500 font-medium text-center tabular-nums">
+                  <span className="w-8 text-xs text-slate-600 dark:text-slate-500 font-medium text-center tabular-nums">
                     {setIdx + 1}
                   </span>
                   {categoryFields[exercise.category || 'strength']?.includes('reps') && (
@@ -318,7 +318,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
                   <button
                     type="button"
                     onClick={() => removeSet(exIdx, setIdx)}
-                    className="w-9 h-9 rounded-lg flex items-center justify-center text-zinc-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors"
                     disabled={exercise.sets.length <= 1}
                   >
                     <Trash2 size={13} />
@@ -335,7 +335,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+      <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
         <Button type="button" variant="default" onClick={onCancel}>
           {t('common.cancel')}
         </Button>

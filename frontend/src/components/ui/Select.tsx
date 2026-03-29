@@ -6,8 +6,8 @@ export function Select({ className, children, ...props }: SelectHTMLAttributes<H
     <div className="relative">
       <select
         className={cn(
-          'w-full appearance-none bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-lg px-3 py-2 pr-8 text-base md:text-sm text-zinc-900 dark:text-zinc-50',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+          'w-full appearance-none bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 pr-8 text-base md:text-sm text-slate-900 dark:text-slate-50',
+          'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
           'disabled:opacity-50 cursor-pointer',
           className
         )}
@@ -16,7 +16,7 @@ export function Select({ className, children, ...props }: SelectHTMLAttributes<H
         {children}
       </select>
       <svg
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400 dark:text-zinc-500"
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500"
         width="16"
         height="16"
         viewBox="0 0 24 24"

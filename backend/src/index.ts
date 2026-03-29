@@ -17,6 +17,7 @@ import progressRouter from './routes/progress';
 import exercisesRouter from './routes/exercises';
 import parseRouter from './routes/parse';
 import plansRouter from './routes/plans';
+import generatePlanRouter from './routes/generatePlan';
 
 export function createApp(): express.Application {
   const app = express();
@@ -91,6 +92,7 @@ export function createApp(): express.Application {
   app.use('/api/settings', auth.middleware, ensureUserMiddleware, settingsRouter);
   app.use('/api/progress', auth.middleware, ensureUserMiddleware, progressRouter);
   app.use('/api/exercises', auth.middleware, ensureUserMiddleware, exercisesRouter);
+  app.use('/api/plans/generate', auth.middleware, ensureUserMiddleware, parseLimiter, generatePlanRouter);
   app.use('/api/plans', auth.middleware, ensureUserMiddleware, plansRouter);
 
   // Global error handler (RFC 9457)

@@ -29,7 +29,7 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
       <div
         className={cn(
           'relative z-50 w-full md:max-w-lg max-h-[90vh] overflow-y-auto',
-          'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl',
+          'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl',
           'rounded-t-xl md:rounded-lg',
           'p-4 md:p-6 md:mx-4',
           'dialog-slide-up',
@@ -38,7 +38,7 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+          className="absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
         >
           <X size={16} />
         </button>
@@ -49,5 +49,5 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
 }
 
 export function DialogTitle({ children, className }: { children: ReactNode; className?: string }) {
-  return <h2 className={cn('text-lg font-bold text-zinc-900 dark:text-zinc-50 mb-4 pr-8', className)}>{children}</h2>;
+  return <h2 className={cn('text-lg font-bold text-slate-900 dark:text-slate-50 mb-4 pr-8', className)}>{children}</h2>;
 }

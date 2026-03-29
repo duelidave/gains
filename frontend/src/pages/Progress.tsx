@@ -6,20 +6,17 @@ import {
   ReferenceDot,
   Area,
   AreaChart,
+  CartesianGrid,
 } from 'recharts';
-import { TrendingUp, Trophy, Search, GitMerge, ExternalLink } from 'lucide-react';
+import { TrendingUp, Trophy, Dumbbell, ChevronDown, GitMerge, ExternalLink, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../components/ui/Card';
-import { Input } from '../components/ui/Input';
 import { Skeleton } from '../components/ui/Skeleton';
-import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Dialog, DialogTitle } from '../components/ui/Dialog';
 import { EmptyState } from '../components/EmptyState';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getExerciseNames, getWorkoutTitles, getProgress, mergeExercises } from '../lib/api';
 import { useSettings } from '../context/SettingsContext';
-import { useTheme } from '../context/ThemeContext';
 import { convertWeight } from '../lib/units';
 import type { ProgressPoint } from '../types';
 
@@ -31,7 +28,6 @@ export default function Progress() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { settings } = useSettings();
-  const { dark } = useTheme();
   const [exerciseNames, setExerciseNames] = useState<string[]>([]);
   const [selectedExercise, setSelectedExercise] = useState(searchParams.get('exercise') || '');
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,11 +43,11 @@ export default function Progress() {
   const [merging, setMerging] = useState(false);
 
   const tooltipStyle = {
-    backgroundColor: dark ? '#27272a' : '#ffffff',
-    border: `1px solid ${dark ? '#3f3f46' : '#e4e4e7'}`,
+    backgroundColor: '#1e293b',
+    border: '1px solid #334155',
     borderRadius: '8px',
     fontSize: '13px',
-    color: dark ? '#fafafa' : '#18181b',
+    color: '#f8fafc',
   };
 
   const fetchNames = (workoutTitle?: string) => {
@@ -115,6 +111,13 @@ export default function Progress() {
 
   const chartDataKey = chartMode === 'e1rm' ? 'e1rm' : 'value';
 
+  // Compute stats for chart header
+  const latestValue = dataConverted.length > 0 ? dataConverted[dataConverted.length - 1][chartDataKey] : 0;
+  const firstValue = dataConverted.length > 1 ? dataConverted[0][chartDataKey] : 0;
+  const changePct = firstValue > 0 ? (((latestValue as number) - (firstValue as number)) / (firstValue as number) * 100) : 0;
+  const allTimeBest = dataConverted.length > 0 ? Math.max(...dataConverted.map((d) => d[chartDataKey] as number)) : 0;
+  const recentBest = prs.length > 0 ? (chartMode === 'e1rm' ? prs[prs.length - 1].e1rm : prs[prs.length - 1].value) : 0;
+
   const handleMerge = async (to: string) => {
     if (!mergeFrom || mergeFrom === to) return;
     setMerging(true);
@@ -132,17 +135,17 @@ export default function Progress() {
 
   return (
     <div className="space-y-5 min-w-0 w-full">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{t('progress.title')}</h1>
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{t('progress.title')}</h1>
 
       {/* Workout type filter */}
       {workoutTitles.length > 1 && (
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setTitleFilter('')}
-            className={`shrink-0 py-1.5 px-3 rounded-full text-xs font-medium transition-colors ${
+            className={`shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-colors ${
               !titleFilter
-                ? 'bg-blue-600 text-white'
-                : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+                ? 'bg-indigo-600 text-white font-semibold'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50'
             }`}
           >
             {t('progress.all')}
@@ -151,10 +154,10 @@ export default function Progress() {
             <button
               key={title}
               onClick={() => setTitleFilter(titleFilter === title ? '' : title)}
-              className={`shrink-0 py-1.5 px-3 rounded-full text-xs font-medium transition-colors ${
+              className={`shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-colors ${
                 titleFilter === title
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+                  ? 'bg-indigo-600 text-white font-semibold'
+                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50'
               }`}
             >
               {title}
@@ -165,32 +168,32 @@ export default function Progress() {
 
       {/* Exercise search */}
       <div className="relative">
-        <Search
-          size={16}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 pointer-events-none z-10"
-        />
-        <Input
-          className="pl-9"
-          placeholder={t('progress.searchExercise')}
-          value={searchQuery || selectedExercise}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setShowDropdown(true);
-            if (!e.target.value) setSelectedExercise('');
-          }}
-          onFocus={() => setShowDropdown(true)}
-          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-        />
+        <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 gap-3 focus-within:border-indigo-500 transition-colors">
+          <Dumbbell className="text-slate-500 w-5 h-5 shrink-0" />
+          <input
+            className="bg-transparent border-none p-0 focus:outline-none focus:ring-0 text-slate-900 dark:text-slate-50 w-full font-medium text-sm placeholder:text-slate-500"
+            placeholder={t('progress.searchExercise')}
+            value={searchQuery || selectedExercise}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowDropdown(true);
+              if (!e.target.value) setSelectedExercise('');
+            }}
+            onFocus={() => setShowDropdown(true)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+          />
+          <ChevronDown className="text-slate-500 w-5 h-5 shrink-0" />
+        </div>
         {showDropdown && filtered.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 shadow-xl">
+          <div className="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 shadow-xl">
             {filtered.map((name) => (
               <div
                 key={name}
-                className="flex items-center hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="flex items-center hover:bg-slate-50 dark:hover:bg-slate-800"
               >
                 <button
                   type="button"
-                  className="flex-1 text-left px-3 py-2.5 text-sm text-zinc-900 dark:text-zinc-50"
+                  className="flex-1 text-left px-4 py-2.5 text-sm text-slate-900 dark:text-slate-50"
                   onMouseDown={() => {
                     setSelectedExercise(name);
                     setSearchQuery('');
@@ -201,7 +204,7 @@ export default function Progress() {
                 </button>
                 <button
                   type="button"
-                  className="px-2 py-2.5 text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400"
+                  className="px-3 py-2.5 text-slate-500 hover:text-indigo-400"
                   title={t('progress.mergeExercise')}
                   onMouseDown={(e) => {
                     e.stopPropagation();
@@ -235,16 +238,16 @@ export default function Progress() {
         />
       ) : (
         <>
-          {/* Period selector */}
-          <div className="flex gap-1.5">
+          {/* Period selector pills */}
+          <div className="flex gap-2">
             {periods.map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors ${
+                className={`px-5 py-2 rounded-full text-sm transition-colors ${
                   period === p
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+                    ? 'bg-indigo-600 text-white font-semibold'
+                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-50'
                 }`}
               >
                 {p}
@@ -253,15 +256,15 @@ export default function Progress() {
           </div>
 
           {/* Chart mode toggle */}
-          <div className="flex gap-1.5">
+          <div className="flex items-center justify-between bg-slate-100 dark:bg-slate-900/50 p-1 rounded-lg border border-slate-200 dark:border-slate-800">
             {(['weight', 'e1rm'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setChartMode(mode)}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors ${
+                className={`flex-1 py-2 text-sm rounded-md transition-colors ${
                   chartMode === mode
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+                    ? 'font-semibold bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-50 shadow-sm'
+                    : 'font-medium text-slate-500'
                 }`}
               >
                 {mode === 'weight' ? t('progress.weight') : t('progress.estimatedOneRM')}
@@ -269,20 +272,37 @@ export default function Progress() {
             ))}
           </div>
 
-          {/* Chart */}
-          <Card>
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">{selectedExercise}</p>
+          {/* Main chart card */}
+          <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div className="flex justify-between items-end mb-4">
+              <div>
+                <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider">
+                  {chartMode === 'e1rm' ? t('progress.estimatedOneRM') : t('progress.weight')} {t('progress.title')}
+                </h3>
+                <p className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400">
+                  {latestValue} <span className="text-sm text-slate-500">{settings.weightUnit}</span>
+                </p>
+              </div>
+              {changePct !== 0 && (
+                <div className="text-right">
+                  <span className={`text-xs font-bold flex items-center gap-1 ${changePct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    <TrendingUp size={14} /> {changePct >= 0 ? '+' : ''}{changePct.toFixed(1)}%
+                  </span>
+                </div>
+              )}
+            </div>
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={dataConverted}>
                 <defs>
                   <linearGradient id="progressGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                    <stop offset="0%" stopColor="rgba(79, 70, 229, 0.3)" stopOpacity={1} />
+                    <stop offset="100%" stopColor="rgba(79, 70, 229, 0)" stopOpacity={1} />
                   </linearGradient>
                 </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fill: dark ? '#a1a1aa' : '#71717a', fontSize: 11 }}
+                  tick={{ fill: '#94a3b8', fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(v) => v.slice(5)}
@@ -298,7 +318,7 @@ export default function Progress() {
                 <Area
                   type="monotone"
                   dataKey={chartDataKey}
-                  stroke="#3b82f6"
+                  stroke="#4f46e5"
                   strokeWidth={2}
                   fill="url(#progressGradient)"
                   dot={false}
@@ -309,103 +329,128 @@ export default function Progress() {
                     x={pr.date}
                     y={chartMode === 'e1rm' ? pr.e1rm : pr.value}
                     r={6}
-                    fill="#eab308"
-                    stroke={dark ? '#18181b' : '#ffffff'}
+                    fill="#fbbf24"
+                    stroke="#18181b"
                     strokeWidth={2}
                   />
                 ))}
               </AreaChart>
             </ResponsiveContainer>
             {prs.length > 0 && (
-              <div className="flex items-center gap-2 mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+              <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
                 {t('progress.personalRecord')}
               </div>
             )}
-          </Card>
+          </section>
+
+          {/* PR highlight cards - 2-column grid */}
+          {prs.length > 0 && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-indigo-600/10 border border-indigo-500/20 rounded-2xl p-4">
+                <h4 className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest mb-1">
+                  {t('progress.allTimeBest') || 'All-Time Best'}
+                </h4>
+                <span className="text-2xl font-black text-slate-900 dark:text-white">{allTimeBest}</span>{' '}
+                <span className="text-sm font-bold text-indigo-300">{settings.weightUnit}</span>
+              </div>
+              <div className="bg-indigo-600/10 border border-indigo-500/20 rounded-2xl p-4">
+                <h4 className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest mb-1">
+                  {t('progress.latestPR') || 'Latest PR'}
+                </h4>
+                <span className="text-2xl font-black text-slate-900 dark:text-white">{recentBest}</span>{' '}
+                <span className="text-sm font-bold text-indigo-300">{settings.weightUnit}</span>
+              </div>
+            </div>
+          )}
 
           {/* PR List */}
           {prs.length > 0 && (
-            <Card>
+            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Trophy size={16} className="text-yellow-500" />
-                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{t('progress.personalRecords')}</p>
+                <Trophy size={16} className="text-amber-400" />
+                <p className="text-sm font-medium text-slate-400">{t('progress.personalRecords')}</p>
               </div>
-              <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
+              <div className="divide-y divide-slate-200 dark:divide-slate-800">
                 {prs.map((pr, i) => (
                   <div
                     key={i}
-                    className={`flex items-center justify-between py-2.5 ${pr.workoutId ? 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 -mx-4 px-4 rounded-lg transition-colors' : ''}`}
+                    className={`flex items-center justify-between py-2.5 ${pr.workoutId ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50 -mx-4 px-4 rounded-lg transition-colors' : ''}`}
                     onClick={() => pr.workoutId && navigate(`/workouts/${pr.workoutId}?highlight=${encodeURIComponent(selectedExercise)}`)}
                   >
-                    <span className="text-sm text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                    <span className="text-sm text-slate-400 flex items-center gap-1.5">
                       {pr.date}
-                      {pr.workoutId && <ExternalLink size={12} className="text-zinc-400" />}
+                      {pr.workoutId && <ExternalLink size={12} className="text-slate-500" />}
                     </span>
-                    <Badge variant="warning">
-                      <span className="tabular-nums font-bold">
-                        {chartMode === 'e1rm' ? pr.e1rm : pr.value} {settings.weightUnit}
-                      </span>
-                    </Badge>
+                    <span className="text-sm tabular-nums font-bold text-amber-400">
+                      {chartMode === 'e1rm' ? pr.e1rm : pr.value} {settings.weightUnit}
+                    </span>
                   </div>
                 ))}
               </div>
-            </Card>
+            </section>
           )}
 
-          {/* History Table */}
-          <Card>
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
-              {t('progress.history')}
-            </p>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-zinc-600 dark:text-zinc-500 text-xs uppercase tracking-wide">
-                    <th className="text-left py-2 pr-4 font-medium">{t('progress.date')}</th>
-                    <th className="text-left py-2 pr-4 font-medium">{t('progress.sets')}</th>
-                    <th className="text-right py-2 pr-4 font-medium">{t('progress.weight')}</th>
-                    <th className="text-right py-2 font-medium">{t('progress.e1rm')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...dataConverted].reverse().map((point, i) => (
+          {/* History table */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-slate-950/50 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+                  <th className="px-4 py-3">{t('progress.date')}</th>
+                  <th className="px-4 py-3">{t('progress.sets')} x Reps @ {t('progress.weight')}</th>
+                  <th className="px-4 py-3 text-right">{t('progress.volume') || 'Volume'}</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {[...dataConverted].reverse().map((point, i) => {
+                  const isPR = chartMode === 'e1rm' ? point.isE1rmPR : point.isPR;
+                  const setsDisplay = point.bestSet
+                    ? `${point.bestSet.setsCount}x${point.bestSet.reps} @ ${point.bestSetWeight > 0 ? `${point.bestSetWeight} ${settings.weightUnit}` : '-'}`
+                    : '-';
+                  const volume = point.bestSet && point.bestSetWeight > 0
+                    ? (point.bestSet.setsCount * point.bestSet.reps * point.bestSetWeight).toFixed(0)
+                    : '-';
+                  return (
                     <tr
                       key={i}
-                      className={`border-t border-zinc-200 dark:border-zinc-800 ${point.workoutId ? 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors' : ''}`}
+                      className={`border-t border-slate-200 dark:border-slate-800 ${isPR ? 'bg-amber-500/5' : ''} ${point.workoutId ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors' : ''}`}
                       onClick={() => point.workoutId && navigate(`/workouts/${point.workoutId}?highlight=${encodeURIComponent(selectedExercise)}`)}
                     >
-                      <td className="py-2.5 pr-4 text-zinc-500 dark:text-zinc-400 tabular-nums">
+                      <td className={`px-4 py-4 font-medium ${isPR ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500'}`}>
                         {point.date.slice(5)}
                       </td>
-                      <td className="py-2.5 pr-4 text-zinc-900 dark:text-zinc-50 tabular-nums">
-                        {point.bestSet
-                          ? `${point.bestSet.setsCount}x${point.bestSet.reps}`
-                          : '-'}
+                      <td className="px-4 py-4">
+                        <span className="font-mono text-slate-700 dark:text-slate-300">{setsDisplay}</span>
+                        {isPR && <Star className="text-amber-500 w-4 h-4 inline ml-2" />}
                       </td>
-                      <td className="py-2.5 pr-4 text-right text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
-                        {point.bestSetWeight > 0
-                          ? `${point.bestSetWeight} ${settings.weightUnit}`
-                          : '-'}
-                      </td>
-                      <td className="py-2.5 text-right text-zinc-900 dark:text-zinc-50 font-medium tabular-nums">
-                        {point.e1rm > 0
-                          ? `${point.e1rm} ${settings.weightUnit}`
-                          : '-'}
+                      <td className="px-4 py-4 text-right font-mono text-slate-400">
+                        {volume !== '-' ? `${volume} ${settings.weightUnit}` : '-'}
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Merge button */}
+          {exerciseNames.length > 1 && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => setMergeFrom(selectedExercise)}
+                className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-slate-900 dark:hover:text-slate-50 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+              >
+                <GitMerge className="w-4 h-4" /> {t('progress.mergeExercise')}
+              </button>
             </div>
-          </Card>
+          )}
         </>
       )}
 
       {/* Merge Exercise Dialog */}
       <Dialog open={!!mergeFrom} onClose={() => setMergeFrom(null)}>
         <DialogTitle>{t('progress.mergeExercise')}</DialogTitle>
-        <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
+        <p className="text-slate-400 text-sm mb-4">
           {t('progress.mergeInto', { from: mergeFrom })}
         </p>
         <div className="max-h-60 overflow-y-auto space-y-1">
@@ -415,7 +460,7 @@ export default function Progress() {
               <button
                 key={name}
                 type="button"
-                className="w-full text-left px-3 py-2.5 text-sm rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-50"
+                className="w-full text-left px-3 py-2.5 text-sm rounded-lg hover:bg-slate-800 text-slate-50"
                 onClick={() => handleMerge(name)}
                 disabled={merging}
               >
