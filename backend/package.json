@@ -7,7 +7,11 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "seed": "ts-node scripts/seed.ts",
-    "import": "ts-node scripts/import-training.ts"
+    "import": "ts-node scripts/import-training.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -24,14 +28,19 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.15.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.14.0",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.15.0"
   }
 }
