@@ -164,7 +164,10 @@ export function createPlan(data: Omit<TrainingPlan, '_id' | 'userId' | 'createdA
   });
 }
 
-export function updatePlan(id: string, data: Partial<Omit<TrainingPlan, '_id' | 'userId' | 'createdAt' | 'updatedAt'>>) {
+export function updatePlan(
+  id: string,
+  data: Partial<Omit<TrainingPlan, '_id' | 'userId' | 'createdAt' | 'updatedAt'>>,
+) {
   return request<TrainingPlan>(`/plans/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),

@@ -78,10 +78,10 @@ export function createLocalAuth(): AuthModule {
     const token = authHeader.substring(7);
 
     try {
-      const decoded = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'], issuer: JWT_ISSUER }) as Record<
-        string,
-        unknown
-      >;
+      const decoded = jwt.verify(token, getJwtSecret(), {
+        algorithms: ['HS256'],
+        issuer: JWT_ISSUER,
+      }) as Record<string, unknown>;
 
       if (decoded.type !== 'access') {
         sendProblem(res, 401, 'Invalid token type', req.originalUrl);
@@ -113,35 +113,39 @@ export function createLocalAuth(): AuthModule {
   });
 
   // Register
-  router.post('/register', validateBody(registerSchema), async (req: AuthRequest, res: Response) => {
-    if (!allowRegistration) {
-      sendProblem(res, 403, 'Registration is disabled', req.originalUrl);
-      return;
-    }
+  router.post(
+    '/register',
+    validateBody(registerSchema),
+    async (req: AuthRequest, res: Response) => {
+      if (!allowRegistration) {
+        sendProblem(res, 403, 'Registration is disabled', req.originalUrl);
+        return;
+      }
 
-    const { email, password, displayName } = req.body;
+      const { email, password, displayName } = req.body;
 
-    const existing = await User.findOne({ email });
-    if (existing) {
-      sendProblem(res, 409, 'An account with this email already exists', req.originalUrl);
-      return;
-    }
+      const existing = await User.findOne({ email });
+      if (existing) {
+        sendProblem(res, 409, 'An account with this email already exists', req.originalUrl);
+        return;
+      }
 
-    const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+      const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
-    const user = await User.create({
-      keycloakId: `local_${crypto.randomUUID()}`,
-      displayName,
-      email,
-      passwordHash,
-      settings: {},
-    });
+      const user = await User.create({
+        keycloakId: `local_${crypto.randomUUID()}`,
+        displayName,
+        email,
+        passwordHash,
+        settings: {},
+      });
 
-    const accessToken = signAccessToken(user.keycloakId, user.email, user.displayName);
-    const refreshToken = signRefreshToken(user.keycloakId);
+      const accessToken = signAccessToken(user.keycloakId, user.email, user.displayName);
+      const refreshToken = signRefreshToken(user.keycloakId);
 
-    res.status(201).json({ accessToken, refreshToken });
-  });
+      res.status(201).json({ accessToken, refreshToken });
+    },
+  );
 
   // Login
   router.post('/login', validateBody(loginSchema), async (req: AuthRequest, res: Response) => {

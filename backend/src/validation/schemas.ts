@@ -62,7 +62,10 @@ export const updateSettingsSchema = z.object({
 // ---------- Parse request schema ----------
 
 export const parseRequestSchema = z.object({
-  messages: z.array(z.string().min(1).max(1000)).min(1, 'messages must be a non-empty array of strings').max(50),
+  messages: z
+    .array(z.string().min(1).max(1000))
+    .min(1, 'messages must be a non-empty array of strings')
+    .max(50),
 });
 
 // ---------- Workout draft schema ----------
@@ -111,9 +114,7 @@ export function validateBody(schema: z.ZodSchema) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      const detail = result.error.issues
-        .map((i) => `${i.path.join('.')}: ${i.message}`)
-        .join('; ');
+      const detail = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
       sendProblem(res, 400, detail, req.originalUrl);
       return;
     }

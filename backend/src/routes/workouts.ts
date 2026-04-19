@@ -22,14 +22,18 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
 });
 
 // Create workout
-router.post('/', validateBody(createWorkoutSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const workout = await WorkoutService.create(req.user!.keycloakId, req.body);
-    res.status(201).json(toWorkoutResponse(workout));
-  } catch (err) {
-    next(err);
-  }
-});
+router.post(
+  '/',
+  validateBody(createWorkoutSchema),
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const workout = await WorkoutService.create(req.user!.keycloakId, req.body);
+      res.status(201).json(toWorkoutResponse(workout));
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // Distinct workout titles for filter chips
 router.get('/titles', async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -70,14 +74,18 @@ router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
 });
 
 // Update workout
-router.put('/:id', validateBody(updateWorkoutSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const workout = await WorkoutService.update(req.user!.keycloakId, req.params.id, req.body);
-    res.json(toWorkoutResponse(workout));
-  } catch (err) {
-    next(err);
-  }
-});
+router.put(
+  '/:id',
+  validateBody(updateWorkoutSchema),
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const workout = await WorkoutService.update(req.user!.keycloakId, req.params.id, req.body);
+      res.json(toWorkoutResponse(workout));
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // Delete workout
 router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {

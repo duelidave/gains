@@ -7,11 +7,15 @@ import { useDraft } from '../context/DraftContext';
 export function BottomNav() {
   const { t } = useTranslation();
   const { hasDraft } = useDraft();
-  const hasSession = hasDraft;
 
   const links = [
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard'), dot: false },
-    { to: hasSession ? '/workouts/new' : '/workouts', icon: Dumbbell, label: t('nav.workouts'), dot: hasSession },
+    {
+      to: hasDraft ? '/workouts/new' : '/workouts',
+      icon: Dumbbell,
+      label: t('nav.workouts'),
+      dot: hasDraft,
+    },
     { to: '/plans', icon: ClipboardList, label: t('nav.plans'), dot: false },
     { to: '/progress', icon: TrendingUp, label: t('nav.progress'), dot: false },
     { to: '/profile', icon: User, label: t('nav.profile'), dot: false },
@@ -30,13 +34,17 @@ export function BottomNav() {
           className={({ isActive }) =>
             cn(
               'flex flex-col items-center justify-center transition-all active:scale-90 duration-200',
-              isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-300'
+              isActive
+                ? 'text-indigo-600 dark:text-indigo-400'
+                : 'text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-300',
             )
           }
         >
           <span className="relative mb-1">
             <Icon size={20} />
-            {dot && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-indigo-500" />}
+            {dot && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-indigo-500" />
+            )}
           </span>
           <span className="text-[10px] font-medium tracking-wide">{label}</span>
         </NavLink>

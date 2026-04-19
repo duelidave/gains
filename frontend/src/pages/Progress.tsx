@@ -8,7 +8,15 @@ import {
   AreaChart,
   CartesianGrid,
 } from 'recharts';
-import { TrendingUp, Trophy, Dumbbell, ChevronDown, GitMerge, ExternalLink, Star } from 'lucide-react';
+import {
+  TrendingUp,
+  Trophy,
+  Dumbbell,
+  ChevronDown,
+  GitMerge,
+  ExternalLink,
+  Star,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
@@ -33,7 +41,9 @@ export default function Progress() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [period, setPeriod] = useState<string>(searchParams.get('period') || '3M');
-  const [chartMode, setChartMode] = useState<ChartMode>((searchParams.get('mode') as ChartMode) || 'weight');
+  const [chartMode, setChartMode] = useState<ChartMode>(
+    (searchParams.get('mode') as ChartMode) || 'weight',
+  );
   const [data, setData] = useState<ProgressPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingNames, setLoadingNames] = useState(true);
@@ -69,7 +79,9 @@ export default function Progress() {
   }, [selectedExercise, period, chartMode, titleFilter, setSearchParams]);
 
   useEffect(() => {
-    getWorkoutTitles().then(setWorkoutTitles).catch(() => {});
+    getWorkoutTitles()
+      .then(setWorkoutTitles)
+      .catch(() => {});
     fetchNames(searchParams.get('title') || undefined);
   }, []);
 
@@ -96,27 +108,47 @@ export default function Progress() {
 
   const dataConverted = data.map((p) => ({
     ...p,
-    value: settings.weightUnit === 'lbs' ? Number(convertWeight(p.value, 'kg', 'lbs').toFixed(1)) : p.value,
-    e1rm: p.e1rm != null
-      ? (settings.weightUnit === 'lbs' ? Number(convertWeight(p.e1rm, 'kg', 'lbs').toFixed(1)) : Math.round(p.e1rm * 10) / 10)
-      : 0,
-    bestSetWeight: p.bestSet?.weight != null
-      ? (settings.weightUnit === 'lbs' ? Number(convertWeight(p.bestSet.weight, 'kg', 'lbs').toFixed(1)) : p.bestSet.weight)
-      : 0,
+    value:
+      settings.weightUnit === 'lbs'
+        ? Number(convertWeight(p.value, 'kg', 'lbs').toFixed(1))
+        : p.value,
+    e1rm:
+      p.e1rm != null
+        ? settings.weightUnit === 'lbs'
+          ? Number(convertWeight(p.e1rm, 'kg', 'lbs').toFixed(1))
+          : Math.round(p.e1rm * 10) / 10
+        : 0,
+    bestSetWeight:
+      p.bestSet?.weight != null
+        ? settings.weightUnit === 'lbs'
+          ? Number(convertWeight(p.bestSet.weight, 'kg', 'lbs').toFixed(1))
+          : p.bestSet.weight
+        : 0,
   }));
 
-  const prs = chartMode === 'e1rm'
-    ? dataConverted.filter((p) => p.isE1rmPR)
-    : dataConverted.filter((p) => p.isPR);
+  const prs =
+    chartMode === 'e1rm'
+      ? dataConverted.filter((p) => p.isE1rmPR)
+      : dataConverted.filter((p) => p.isPR);
 
   const chartDataKey = chartMode === 'e1rm' ? 'e1rm' : 'value';
 
   // Compute stats for chart header
-  const latestValue = dataConverted.length > 0 ? dataConverted[dataConverted.length - 1][chartDataKey] : 0;
+  const latestValue =
+    dataConverted.length > 0 ? dataConverted[dataConverted.length - 1][chartDataKey] : 0;
   const firstValue = dataConverted.length > 1 ? dataConverted[0][chartDataKey] : 0;
-  const changePct = firstValue > 0 ? (((latestValue as number) - (firstValue as number)) / (firstValue as number) * 100) : 0;
-  const allTimeBest = dataConverted.length > 0 ? Math.max(...dataConverted.map((d) => d[chartDataKey] as number)) : 0;
-  const recentBest = prs.length > 0 ? (chartMode === 'e1rm' ? prs[prs.length - 1].e1rm : prs[prs.length - 1].value) : 0;
+  const changePct =
+    firstValue > 0
+      ? (((latestValue as number) - (firstValue as number)) / (firstValue as number)) * 100
+      : 0;
+  const allTimeBest =
+    dataConverted.length > 0 ? Math.max(...dataConverted.map((d) => d[chartDataKey] as number)) : 0;
+  const recentBest =
+    prs.length > 0
+      ? chartMode === 'e1rm'
+        ? prs[prs.length - 1].e1rm
+        : prs[prs.length - 1].value
+      : 0;
 
   const handleMerge = async (to: string) => {
     if (!mergeFrom || mergeFrom === to) return;
@@ -135,7 +167,9 @@ export default function Progress() {
 
   return (
     <div className="space-y-5 min-w-0 w-full">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{t('progress.title')}</h1>
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">
+        {t('progress.title')}
+      </h1>
 
       {/* Workout type filter */}
       {workoutTitles.length > 1 && (
@@ -277,16 +311,21 @@ export default function Progress() {
             <div className="flex justify-between items-end mb-4">
               <div>
                 <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-                  {chartMode === 'e1rm' ? t('progress.estimatedOneRM') : t('progress.weight')} {t('progress.title')}
+                  {chartMode === 'e1rm' ? t('progress.estimatedOneRM') : t('progress.weight')}{' '}
+                  {t('progress.title')}
                 </h3>
                 <p className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400">
-                  {latestValue} <span className="text-sm text-slate-500">{settings.weightUnit}</span>
+                  {latestValue}{' '}
+                  <span className="text-sm text-slate-500">{settings.weightUnit}</span>
                 </p>
               </div>
               {changePct !== 0 && (
                 <div className="text-right">
-                  <span className={`text-xs font-bold flex items-center gap-1 ${changePct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    <TrendingUp size={14} /> {changePct >= 0 ? '+' : ''}{changePct.toFixed(1)}%
+                  <span
+                    className={`text-xs font-bold flex items-center gap-1 ${changePct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}
+                  >
+                    <TrendingUp size={14} /> {changePct >= 0 ? '+' : ''}
+                    {changePct.toFixed(1)}%
                   </span>
                 </div>
               )}
@@ -351,14 +390,18 @@ export default function Progress() {
                 <h4 className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest mb-1">
                   {t('progress.allTimeBest') || 'All-Time Best'}
                 </h4>
-                <span className="text-2xl font-black text-slate-900 dark:text-white">{allTimeBest}</span>{' '}
+                <span className="text-2xl font-black text-slate-900 dark:text-white">
+                  {allTimeBest}
+                </span>{' '}
                 <span className="text-sm font-bold text-indigo-300">{settings.weightUnit}</span>
               </div>
               <div className="bg-indigo-600/10 border border-indigo-500/20 rounded-2xl p-4">
                 <h4 className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest mb-1">
                   {t('progress.latestPR') || 'Latest PR'}
                 </h4>
-                <span className="text-2xl font-black text-slate-900 dark:text-white">{recentBest}</span>{' '}
+                <span className="text-2xl font-black text-slate-900 dark:text-white">
+                  {recentBest}
+                </span>{' '}
                 <span className="text-sm font-bold text-indigo-300">{settings.weightUnit}</span>
               </div>
             </div>
@@ -369,14 +412,21 @@ export default function Progress() {
             <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Trophy size={16} className="text-amber-400" />
-                <p className="text-sm font-medium text-slate-400">{t('progress.personalRecords')}</p>
+                <p className="text-sm font-medium text-slate-400">
+                  {t('progress.personalRecords')}
+                </p>
               </div>
               <div className="divide-y divide-slate-200 dark:divide-slate-800">
                 {prs.map((pr, i) => (
                   <div
                     key={i}
                     className={`flex items-center justify-between py-2.5 ${pr.workoutId ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50 -mx-4 px-4 rounded-lg transition-colors' : ''}`}
-                    onClick={() => pr.workoutId && navigate(`/workouts/${pr.workoutId}?highlight=${encodeURIComponent(selectedExercise)}`)}
+                    onClick={() =>
+                      pr.workoutId &&
+                      navigate(
+                        `/workouts/${pr.workoutId}?highlight=${encodeURIComponent(selectedExercise)}`,
+                      )
+                    }
                   >
                     <span className="text-sm text-slate-400 flex items-center gap-1.5">
                       {pr.date}
@@ -397,7 +447,9 @@ export default function Progress() {
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-950/50 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
                   <th className="px-4 py-3">{t('progress.date')}</th>
-                  <th className="px-4 py-3">{t('progress.sets')} x Reps @ {t('progress.weight')}</th>
+                  <th className="px-4 py-3">
+                    {t('progress.sets')} x Reps @ {t('progress.weight')}
+                  </th>
                   <th className="px-4 py-3 text-right">{t('progress.volume') || 'Volume'}</th>
                 </tr>
               </thead>
@@ -407,20 +459,34 @@ export default function Progress() {
                   const setsDisplay = point.bestSet
                     ? `${point.bestSet.setsCount}x${point.bestSet.reps} @ ${point.bestSetWeight > 0 ? `${point.bestSetWeight} ${settings.weightUnit}` : '-'}`
                     : '-';
-                  const volume = point.bestSet && point.bestSetWeight > 0
-                    ? (point.bestSet.setsCount * point.bestSet.reps * point.bestSetWeight).toFixed(0)
-                    : '-';
+                  const volume =
+                    point.bestSet && point.bestSetWeight > 0
+                      ? (
+                          point.bestSet.setsCount *
+                          point.bestSet.reps *
+                          point.bestSetWeight
+                        ).toFixed(0)
+                      : '-';
                   return (
                     <tr
                       key={i}
                       className={`border-t border-slate-200 dark:border-slate-800 ${isPR ? 'bg-amber-500/5' : ''} ${point.workoutId ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors' : ''}`}
-                      onClick={() => point.workoutId && navigate(`/workouts/${point.workoutId}?highlight=${encodeURIComponent(selectedExercise)}`)}
+                      onClick={() =>
+                        point.workoutId &&
+                        navigate(
+                          `/workouts/${point.workoutId}?highlight=${encodeURIComponent(selectedExercise)}`,
+                        )
+                      }
                     >
-                      <td className={`px-4 py-4 font-medium ${isPR ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500'}`}>
+                      <td
+                        className={`px-4 py-4 font-medium ${isPR ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500'}`}
+                      >
                         {point.date.slice(5)}
                       </td>
                       <td className="px-4 py-4">
-                        <span className="font-mono text-slate-700 dark:text-slate-300">{setsDisplay}</span>
+                        <span className="font-mono text-slate-700 dark:text-slate-300">
+                          {setsDisplay}
+                        </span>
                         {isPR && <Star className="text-amber-500 w-4 h-4 inline ml-2" />}
                       </td>
                       <td className="px-4 py-4 text-right font-mono text-slate-400">

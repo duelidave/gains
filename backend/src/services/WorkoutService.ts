@@ -54,7 +54,13 @@ export const WorkoutService = {
 
   async create(
     userId: string,
-    data: { title: string; date?: string; notes?: string; exercises?: unknown[]; duration?: number },
+    data: {
+      title: string;
+      date?: string;
+      notes?: string;
+      exercises?: unknown[];
+      duration?: number;
+    },
   ): Promise<IWorkout> {
     return Workout.create({
       userId,

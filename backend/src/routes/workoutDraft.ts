@@ -20,18 +20,22 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
 });
 
 // PUT /api/workouts/draft
-router.put('/', validateBody(workoutDraftSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    await WorkoutDraft.findOneAndUpdate(
-      { userId: req.user!.keycloakId },
-      { userId: req.user!.keycloakId, state: req.body },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
-    );
-    res.json({ ok: true });
-  } catch (err) {
-    next(err);
-  }
-});
+router.put(
+  '/',
+  validateBody(workoutDraftSchema),
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      await WorkoutDraft.findOneAndUpdate(
+        { userId: req.user!.keycloakId },
+        { userId: req.user!.keycloakId, state: req.body },
+        { upsert: true, new: true, setDefaultsOnInsert: true },
+      );
+      res.json({ ok: true });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // DELETE /api/workouts/draft
 router.delete('/', async (req: AuthRequest, res: Response, next: NextFunction) => {

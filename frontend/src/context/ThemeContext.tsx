@@ -22,7 +22,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggle = useCallback(() => setDarkState((d) => !d), []);
   const setDark = useCallback((v: boolean) => setDarkState(v), []);
 
-  return <ThemeContext.Provider value={{ dark, toggle, setDark }}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={{ dark, toggle, setDark }}>{children}</ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {

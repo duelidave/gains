@@ -25,10 +25,12 @@ export function createApp(): express.Application {
 
   app.set('trust proxy', 1);
   app.use(helmet());
-  app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-    credentials: true,
-  }));
+  app.use(
+    cors({
+      origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+      credentials: true,
+    }),
+  );
   app.use(morgan('short'));
   app.use(express.json({ limit: '50kb' }));
 
@@ -88,10 +90,18 @@ export function createApp(): express.Application {
   app.use('/api/auth/register', loginLimiter);
   app.use('/api/auth', auth.router);
 
-  const maybeParseLimiter: express.RequestHandler = isDev ? (_req, _res, next) => next() : parseLimiter;
+  const maybeParseLimiter: express.RequestHandler = isDev
+    ? (_req, _res, next) => next()
+    : parseLimiter;
 
   // Protected routes — auth + ensureUser on all
-  app.use('/api/workouts/parse', auth.middleware, ensureUserMiddleware, maybeParseLimiter, parseRouter);
+  app.use(
+    '/api/workouts/parse',
+    auth.middleware,
+    ensureUserMiddleware,
+    maybeParseLimiter,
+    parseRouter,
+  );
   app.use('/api/workouts/draft', auth.middleware, ensureUserMiddleware, workoutDraftRouter);
   app.use('/api/workouts', auth.middleware, ensureUserMiddleware, workoutRouter);
   app.use('/api/stats', auth.middleware, ensureUserMiddleware, statsRouter);
@@ -99,7 +109,13 @@ export function createApp(): express.Application {
   app.use('/api/settings', auth.middleware, ensureUserMiddleware, settingsRouter);
   app.use('/api/progress', auth.middleware, ensureUserMiddleware, progressRouter);
   app.use('/api/exercises', auth.middleware, ensureUserMiddleware, exercisesRouter);
-  app.use('/api/plans/generate', auth.middleware, ensureUserMiddleware, maybeParseLimiter, generatePlanRouter);
+  app.use(
+    '/api/plans/generate',
+    auth.middleware,
+    ensureUserMiddleware,
+    maybeParseLimiter,
+    generatePlanRouter,
+  );
   app.use('/api/plans', auth.middleware, ensureUserMiddleware, plansRouter);
 
   // Global error handler (RFC 9457)

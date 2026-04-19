@@ -33,7 +33,7 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
           'rounded-t-xl md:rounded-lg',
           'p-4 md:p-6 md:mx-4',
           'dialog-slide-up',
-          className
+          className,
         )}
       >
         <button
@@ -49,5 +49,9 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
 }
 
 export function DialogTitle({ children, className }: { children: ReactNode; className?: string }) {
-  return <h2 className={cn('text-lg font-bold text-slate-900 dark:text-slate-50 mb-4 pr-8', className)}>{children}</h2>;
+  return (
+    <h2 className={cn('text-lg font-bold text-slate-900 dark:text-slate-50 mb-4 pr-8', className)}>
+      {children}
+    </h2>
+  );
 }

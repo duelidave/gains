@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://admin:secret@localhost:27017/fitness?authSource=admin';
+const MONGO_URI =
+  process.env.MONGO_URI || 'mongodb://admin:secret@localhost:27017/fitness?authSource=admin';
 const KEYCLOAK_ID = process.argv[2] || 'demo-user-id';
 
 interface ExerciseSet {
@@ -24,7 +25,10 @@ interface WorkoutDoc {
   duration: number;
 }
 
-const workoutTemplates: Array<{ title: string; exercises: Array<{ name: string; type: 'strength' | 'cardio' }> }> = [
+const workoutTemplates: Array<{
+  title: string;
+  exercises: Array<{ name: string; type: 'strength' | 'cardio' }>;
+}> = [
   {
     title: 'Upper Body Push',
     exercises: [
@@ -72,10 +76,21 @@ const workoutTemplates: Array<{ title: string; exercises: Array<{ name: string; 
 ];
 
 const baseWeights: Record<string, number> = {
-  'Bench Press': 60, 'Overhead Press': 40, 'Incline Dumbbell Press': 20,
-  'Tricep Dips': 0, 'Barbell Row': 50, 'Pull-Ups': 0, 'Face Pulls': 15,
-  'Bicep Curls': 12, 'Squat': 80, 'Romanian Deadlift': 70, 'Leg Press': 120,
-  'Calf Raises': 40, 'Deadlift': 100, 'Plank': 0, 'Russian Twists': 5,
+  'Bench Press': 60,
+  'Overhead Press': 40,
+  'Incline Dumbbell Press': 20,
+  'Tricep Dips': 0,
+  'Barbell Row': 50,
+  'Pull-Ups': 0,
+  'Face Pulls': 15,
+  'Bicep Curls': 12,
+  Squat: 80,
+  'Romanian Deadlift': 70,
+  'Leg Press': 120,
+  'Calf Raises': 40,
+  Deadlift: 100,
+  Plank: 0,
+  'Russian Twists': 5,
 };
 
 function rand(min: number, max: number): number {
@@ -113,7 +128,10 @@ async function seed() {
   await mongoose.connect(MONGO_URI);
   console.log('Connected to MongoDB');
 
-  const Workout = mongoose.model('Workout', new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'workouts' }));
+  const Workout = mongoose.model(
+    'Workout',
+    new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'workouts' }),
+  );
 
   // Delete existing data for this user
   await Workout.deleteMany({ userId: KEYCLOAK_ID });
@@ -130,20 +148,30 @@ async function seed() {
     const dayOfWeek = current.getDay();
 
     // Workout on ~4-5 days per week (skip some Sundays and Wednesdays randomly)
-    const skip = (dayOfWeek === 0 && Math.random() > 0.3) || (dayOfWeek === 3 && Math.random() > 0.5);
+    const skip =
+      (dayOfWeek === 0 && Math.random() > 0.3) || (dayOfWeek === 3 && Math.random() > 0.5);
 
     if (!skip) {
       const template = workoutTemplates[templateIdx % workoutTemplates.length];
       templateIdx++;
 
-      const weekOffset = Math.floor((current.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+      const weekOffset = Math.floor(
+        (current.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000),
+      );
 
       const exercises = template.exercises.map((e) => generateExercise(e, weekOffset));
       const duration = rand(35, 75);
 
-      const notes = Math.random() > 0.7
-        ? ['Felt great today!', 'Tough session', 'New PR on main lift!', 'Easy deload', 'Pushed hard'][rand(0, 4)]
-        : '';
+      const notes =
+        Math.random() > 0.7
+          ? [
+              'Felt great today!',
+              'Tough session',
+              'New PR on main lift!',
+              'Easy deload',
+              'Pushed hard',
+            ][rand(0, 4)]
+          : '';
 
       const workoutDate = new Date(current);
       workoutDate.setHours(rand(6, 19), rand(0, 59), 0, 0);

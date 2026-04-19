@@ -32,8 +32,6 @@ export function formatDate(
         ? format(date, 'd. MMM yyyy', { locale })
         : format(date, 'MMM d, yyyy', { locale });
     case 'compact':
-      return lang === 'de'
-        ? format(date, 'd. MMM', { locale })
-        : format(date, 'MMM d', { locale });
+      return lang === 'de' ? format(date, 'd. MMM', { locale }) : format(date, 'MMM d', { locale });
   }
 }

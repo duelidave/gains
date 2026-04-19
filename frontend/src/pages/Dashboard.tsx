@@ -39,12 +39,7 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    Promise.allSettled([
-      getStreak(),
-      getWeeklyStats(),
-      getVolumeStats(),
-      getWorkouts(1, 5),
-    ])
+    Promise.allSettled([getStreak(), getWeeklyStats(), getVolumeStats(), getWorkouts(1, 5)])
       .then(([streakRes, weeklyRes, volumeRes, workoutsRes]) => {
         if (streakRes.status === 'fulfilled') setStreak(streakRes.value);
         if (weeklyRes.status === 'fulfilled') setWeekly(weeklyRes.value);
@@ -62,13 +57,20 @@ export default function Dashboard() {
 
   const volumeConverted = volume.map((v) => ({
     ...v,
-    volume: settings.weightUnit === 'lbs' ? Math.round(convertWeight(v.volume, 'kg', 'lbs')) : v.volume,
+    volume:
+      settings.weightUnit === 'lbs' ? Math.round(convertWeight(v.volume, 'kg', 'lbs')) : v.volume,
   }));
 
   // Calculate volume trend percentage
-  const volumeTrend = volumeConverted.length >= 2
-    ? Math.round(((volumeConverted[volumeConverted.length - 1].volume - volumeConverted[volumeConverted.length - 2].volume) / (volumeConverted[volumeConverted.length - 2].volume || 1)) * 100)
-    : 0;
+  const volumeTrend =
+    volumeConverted.length >= 2
+      ? Math.round(
+          ((volumeConverted[volumeConverted.length - 1].volume -
+            volumeConverted[volumeConverted.length - 2].volume) /
+            (volumeConverted[volumeConverted.length - 2].volume || 1)) *
+            100,
+        )
+      : 0;
 
   if (loading) {
     return (
@@ -104,11 +106,15 @@ export default function Dashboard() {
         {/* Streak */}
         <div className="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-32">
           <div className="flex justify-between items-start">
-            <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">{t('dashboard.streak')}</span>
+            <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              {t('dashboard.streak')}
+            </span>
             <Flame className="w-5 h-5 text-orange-500" />
           </div>
           <div>
-            <span className="text-3xl font-black tabular-nums text-slate-900 dark:text-slate-100">{streak?.current || 0}</span>
+            <span className="text-3xl font-black tabular-nums text-slate-900 dark:text-slate-100">
+              {streak?.current || 0}
+            </span>
             <span className="text-slate-500 text-sm ml-1 font-medium">{t('common.days')}</span>
           </div>
         </div>
@@ -116,12 +122,16 @@ export default function Dashboard() {
         {/* This Week */}
         <div className="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-32">
           <div className="flex justify-between items-start">
-            <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">{t('dashboard.thisWeek')}</span>
+            <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              {t('dashboard.thisWeek')}
+            </span>
             <Dumbbell className="w-5 h-5 text-indigo-400" />
           </div>
           <div>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-black tabular-nums text-slate-900 dark:text-slate-100">{totalWeeklyWorkouts}</span>
+              <span className="text-3xl font-black tabular-nums text-slate-900 dark:text-slate-100">
+                {totalWeeklyWorkouts}
+              </span>
               <span className="text-slate-500 text-sm font-medium">/ {weeklyGoal}</span>
             </div>
             <div className="mt-1.5 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -136,11 +146,15 @@ export default function Dashboard() {
         {/* This Month */}
         <div className="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-32">
           <div className="flex justify-between items-start">
-            <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">{t('dashboard.thisMonth')}</span>
+            <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              {t('dashboard.thisMonth')}
+            </span>
             <CalendarDays className="w-5 h-5 text-emerald-400" />
           </div>
           <div>
-            <span className="text-3xl font-black tabular-nums text-slate-900 dark:text-slate-100">{totalMonthWorkouts}</span>
+            <span className="text-3xl font-black tabular-nums text-slate-900 dark:text-slate-100">
+              {totalMonthWorkouts}
+            </span>
             <span className="text-slate-500 text-sm ml-1 font-medium">{t('common.workouts')}</span>
           </div>
         </div>
@@ -148,11 +162,15 @@ export default function Dashboard() {
         {/* Best Streak */}
         <div className="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-32">
           <div className="flex justify-between items-start">
-            <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">{t('dashboard.bestStreak')}</span>
+            <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              {t('dashboard.bestStreak')}
+            </span>
             <Trophy className="w-5 h-5 text-amber-400" />
           </div>
           <div>
-            <span className="text-3xl font-black tabular-nums text-slate-900 dark:text-slate-100">{streak?.longest || 0}</span>
+            <span className="text-3xl font-black tabular-nums text-slate-900 dark:text-slate-100">
+              {streak?.longest || 0}
+            </span>
             <span className="text-slate-500 text-sm ml-1 font-medium">{t('common.days')}</span>
           </div>
         </div>
@@ -162,7 +180,9 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Weekly Activity bar chart */}
         <section className="bg-white dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-800">
-          <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-6">{t('dashboard.thisWeek')}</h2>
+          <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-6">
+            {t('dashboard.thisWeek')}
+          </h2>
           {weekly.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={weekly}>
@@ -173,7 +193,10 @@ export default function Dashboard() {
                   tickLine={false}
                   axisLine={false}
                 />
-                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(99, 102, 241, 0.08)' }} />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  cursor={{ fill: 'rgba(99, 102, 241, 0.08)' }}
+                />
                 <Bar
                   dataKey="count"
                   barSize={28}
@@ -204,17 +227,22 @@ export default function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-slate-500 text-sm text-center py-10">{t('dashboard.noWorkoutsThisWeek')}</p>
+            <p className="text-slate-500 text-sm text-center py-10">
+              {t('dashboard.noWorkoutsThisWeek')}
+            </p>
           )}
         </section>
 
         {/* Volume trend */}
         <section className="bg-white dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-800">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t('dashboard.volume')}</h2>
+            <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+              {t('dashboard.volume')}
+            </h2>
             {volumeTrend !== 0 && (
               <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">
-                {volumeTrend > 0 ? '+' : ''}{volumeTrend}%
+                {volumeTrend > 0 ? '+' : ''}
+                {volumeTrend}%
               </span>
             )}
           </div>
@@ -236,7 +264,10 @@ export default function Dashboard() {
                 />
                 <Tooltip
                   contentStyle={tooltipStyle}
-                  formatter={(value: number) => [`${value.toLocaleString()} ${settings.weightUnit}`, 'Volume']}
+                  formatter={(value: number) => [
+                    `${value.toLocaleString()} ${settings.weightUnit}`,
+                    'Volume',
+                  ]}
                 />
                 <Area
                   type="monotone"
@@ -249,7 +280,9 @@ export default function Dashboard() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-slate-500 text-sm text-center py-10">{t('dashboard.startLogging')}</p>
+            <p className="text-slate-500 text-sm text-center py-10">
+              {t('dashboard.startLogging')}
+            </p>
           )}
         </section>
       </div>
@@ -257,7 +290,9 @@ export default function Dashboard() {
       {/* Recent workouts */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t('dashboard.recent')}</h2>
+          <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+            {t('dashboard.recent')}
+          </h2>
           <Link
             to="/workouts"
             className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 flex items-center gap-1 font-medium transition-colors"
@@ -277,9 +312,12 @@ export default function Dashboard() {
                   <Dumbbell className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 truncate">{w.title}</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 truncate">
+                    {w.title}
+                  </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    {formatDate(w.date, 'short', i18n.language)} &bull; {t('dashboard.exerciseCount', { count: w.exercises.length })}
+                    {formatDate(w.date, 'short', i18n.language)} &bull;{' '}
+                    {t('dashboard.exerciseCount', { count: w.exercises.length })}
                   </p>
                 </div>
                 <ChevronRight className="text-slate-400 dark:text-slate-600 w-4 h-4 shrink-0" />

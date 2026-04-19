@@ -7,11 +7,15 @@ import { useDraft } from '../context/DraftContext';
 export function Sidebar() {
   const { t } = useTranslation();
   const { hasDraft } = useDraft();
-  const hasSession = hasDraft;
 
   const links = [
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard'), dot: false },
-    { to: hasSession ? '/workouts/new' : '/workouts', icon: Dumbbell, label: t('nav.workouts'), dot: hasSession },
+    {
+      to: hasDraft ? '/workouts/new' : '/workouts',
+      icon: Dumbbell,
+      label: t('nav.workouts'),
+      dot: hasDraft,
+    },
     { to: '/plans', icon: ClipboardList, label: t('nav.plans'), dot: false },
     { to: '/progress', icon: TrendingUp, label: t('nav.progress'), dot: false },
     { to: '/profile', icon: User, label: t('nav.profile'), dot: false },
@@ -33,13 +37,15 @@ export function Sidebar() {
                 'flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 rounded-lg mx-2',
                 isActive
                   ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-r-4 border-indigo-500'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50',
               )
             }
           >
             <span className="relative">
               <Icon size={18} />
-              {dot && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-indigo-500" />}
+              {dot && (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-indigo-500" />
+              )}
             </span>
             {label}
           </NavLink>

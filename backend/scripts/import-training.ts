@@ -2,9 +2,11 @@ import mongoose from 'mongoose';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://admin:secret@localhost:27017/fitness?authSource=admin';
+const MONGO_URI =
+  process.env.MONGO_URI || 'mongodb://admin:secret@localhost:27017/fitness?authSource=admin';
 const KEYCLOAK_ID = process.argv[2] || process.env.KEYCLOAK_ID || '';
-const EXPORT_FILE = process.argv[3] || process.env.EXPORT_FILE || resolve(process.cwd(), 'training-export.json');
+const EXPORT_FILE =
+  process.argv[3] || process.env.EXPORT_FILE || resolve(process.cwd(), 'training-export.json');
 
 if (!KEYCLOAK_ID) {
   console.error('Usage: ts-node scripts/import-training.ts <keycloak-id> [export-file-path]');
@@ -76,7 +78,7 @@ function capitalizeType(type: string): string {
 
 function detectCategory(exercise: ExportExercise): string {
   const hasDuration = exercise.sets.some(
-    (s) => s.duration_minutes != null || s.duration_seconds != null
+    (s) => s.duration_minutes != null || s.duration_seconds != null,
   );
   if (hasDuration) return 'cardio';
   if (exercise.bodyweight) return 'bodyweight';
@@ -171,7 +173,7 @@ async function importData() {
   // Use a loose model (same pattern as seed.ts) to avoid schema conflicts
   const Workout = mongoose.model(
     'Workout',
-    new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'workouts' })
+    new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'workouts' }),
   );
 
   let imported = 0;
@@ -205,9 +207,11 @@ async function importData() {
     const exerciseCount = workout.exercises.length;
     const setCount = workout.exercises.reduce(
       (sum, ex) => sum + (Array.isArray(ex.sets) ? (ex.sets as unknown[]).length : 0),
-      0
+      0,
     );
-    console.log(`  Imported: ${title} on ${session.date} (${exerciseCount} exercises, ${setCount} sets)`);
+    console.log(
+      `  Imported: ${title} on ${session.date} (${exerciseCount} exercises, ${setCount} sets)`,
+    );
     imported++;
   }
 

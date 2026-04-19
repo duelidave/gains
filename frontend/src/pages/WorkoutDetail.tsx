@@ -48,7 +48,7 @@ export default function WorkoutDetail() {
   // Map API exercises to display exercises
   const displayExercises = useMemo(
     () => workout?.exercises.map(toDisplayExercise) ?? [],
-    [workout]
+    [workout],
   );
 
   const handleUpdate = async (data: WorkoutInput) => {
@@ -80,7 +80,7 @@ export default function WorkoutDetail() {
   // Compute total volume (sets x weight) and total sets
   const totalSets = useMemo(
     () => displayExercises.reduce((sum, ex) => sum + ex.sets.length, 0),
-    [displayExercises]
+    [displayExercises],
   );
 
   if (loading) {
@@ -97,7 +97,10 @@ export default function WorkoutDetail() {
     return (
       <div className="text-center py-20">
         <p className="text-red-400 text-sm mb-4">{error || t('workoutDetail.workoutNotFound')}</p>
-        <Link to="/workouts" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm font-medium">
+        <Link
+          to="/workouts"
+          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm font-medium"
+        >
           {t('workoutDetail.backToWorkouts')}
         </Link>
       </div>
@@ -107,7 +110,9 @@ export default function WorkoutDetail() {
   if (editing) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">{t('workoutDetail.editWorkout')}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
+          {t('workoutDetail.editWorkout')}
+        </h1>
         <WorkoutForm
           initial={{
             title: workout.title,
@@ -153,27 +158,35 @@ export default function WorkoutDetail() {
       <section className="relative overflow-hidden rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6">
         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/10 blur-3xl -mr-16 -mt-16 rounded-full"></div>
         <div className="relative z-10">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white mb-1">{workout.title}</h2>
+          <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white mb-1">
+            {workout.title}
+          </h2>
           <p className="text-slate-500 dark:text-slate-400 font-medium">
             {formatDate(workout.date, 'long', i18n.language)}
           </p>
-          {workout.notes && (
-            <p className="text-slate-500 text-sm italic mt-2">{workout.notes}</p>
-          )}
+          {workout.notes && <p className="text-slate-500 text-sm italic mt-2">{workout.notes}</p>}
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700/50">
               <div className="flex items-center gap-2 mb-1">
                 <Dumbbell size={14} className="text-slate-500" />
-                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t('workouts.exercises', { defaultValue: 'Exercises' })}</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
+                  {t('workouts.exercises', { defaultValue: 'Exercises' })}
+                </p>
               </div>
-              <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{displayExercises.length}</p>
+              <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+                {displayExercises.length}
+              </p>
             </div>
             <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700/50">
               <div className="flex items-center gap-2 mb-1">
                 <Clock size={14} className="text-slate-500" />
-                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t('workouts.totalSets', { defaultValue: 'Total Sets' })}</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
+                  {t('workouts.totalSets', { defaultValue: 'Total Sets' })}
+                </p>
               </div>
-              <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{totalSets}</p>
+              <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+                {totalSets}
+              </p>
             </div>
           </div>
         </div>
@@ -195,15 +208,21 @@ export default function WorkoutDetail() {
 
           return (
             <div key={idx} ref={isHighlighted ? highlightRef : undefined}>
-              <div className={`bg-white dark:bg-slate-900 border rounded-xl overflow-hidden ${isHighlighted ? 'ring-2 ring-yellow-500/50 border-yellow-500/30' : 'border-slate-200 dark:border-slate-800'}`}>
+              <div
+                className={`bg-white dark:bg-slate-900 border rounded-xl overflow-hidden ${isHighlighted ? 'ring-2 ring-yellow-500/50 border-yellow-500/30' : 'border-slate-200 dark:border-slate-800'}`}
+              >
                 {/* Exercise header */}
                 <div className="flex items-center gap-3 p-4 pb-0">
                   <div className="w-8 h-8 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
                     {idx + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-slate-900 dark:text-white truncate">{exercise.name}</h3>
-                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">{exercise.category}</p>
+                    <h3 className="font-bold text-slate-900 dark:text-white truncate">
+                      {exercise.name}
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">
+                      {exercise.category}
+                    </p>
                   </div>
                 </div>
                 {exercise.notes && (
@@ -215,36 +234,51 @@ export default function WorkoutDetail() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-slate-50 dark:bg-slate-800/50">
-                        <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">#</th>
+                        <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">
+                          #
+                        </th>
                         {cols.showReps && (
-                          <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">{t('workoutDetail.reps')}</th>
+                          <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">
+                            {t('workoutDetail.reps')}
+                          </th>
                         )}
                         {cols.showWeight && (
-                          <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">{t('workoutDetail.weight')}</th>
+                          <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">
+                            {t('workoutDetail.weight')}
+                          </th>
                         )}
                         {cols.showDuration && (
-                          <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">{t('workoutDetail.duration')}</th>
+                          <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">
+                            {t('workoutDetail.duration')}
+                          </th>
                         )}
                         {cols.showDistance && (
-                          <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">{t('workoutDetail.distance')}</th>
+                          <th className="text-left py-2 px-4 text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">
+                            {t('workoutDetail.distance')}
+                          </th>
                         )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
                       {exercise.sets.map((set, si) => (
-                        <tr key={si} className={si % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/20' : ''}>
+                        <tr
+                          key={si}
+                          className={si % 2 === 1 ? 'bg-slate-50 dark:bg-slate-800/20' : ''}
+                        >
                           <td className="py-2 px-4 text-slate-500 tabular-nums">{si + 1}</td>
                           {cols.showReps && (
                             <td className="py-2 px-4 font-bold text-slate-900 dark:text-slate-100 tabular-nums">
-                              {set.isDropset && set.repsDisplay
-                                ? set.repsDisplay
-                                : set.reps || '-'}
+                              {set.isDropset && set.repsDisplay ? set.repsDisplay : set.reps || '-'}
                             </td>
                           )}
                           {cols.showWeight && (
                             <td className="py-2 px-4 font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                               {set.weight > 0
-                                ? formatWeight(set.weight, set.unit as 'kg' | 'lbs', settings.weightUnit)
+                                ? formatWeight(
+                                    set.weight,
+                                    set.unit as 'kg' | 'lbs',
+                                    settings.weightUnit,
+                                  )
                                 : '-'}
                             </td>
                           )}
@@ -258,7 +292,11 @@ export default function WorkoutDetail() {
                           {cols.showDistance && (
                             <td className="py-2 px-4 font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                               {set.distance != null
-                                ? formatDistance(set.distance, (set.distanceUnit || 'km') as 'km' | 'mi', settings.distanceUnit)
+                                ? formatDistance(
+                                    set.distance,
+                                    (set.distanceUnit || 'km') as 'km' | 'mi',
+                                    settings.distanceUnit,
+                                  )
                                 : '-'}
                             </td>
                           )}
@@ -270,9 +308,15 @@ export default function WorkoutDetail() {
                   {/* Total volume footer */}
                   {exerciseVolume > 0 && (
                     <div className="p-4 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t('workoutDetail.totalVolume', { defaultValue: 'Total Volume' })}</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
+                        {t('workoutDetail.totalVolume', { defaultValue: 'Total Volume' })}
+                      </span>
                       <span className="text-indigo-600 dark:text-indigo-400 font-mono font-bold">
-                        {formatWeight(exerciseVolume, exercise.sets[0]?.unit as 'kg' | 'lbs', settings.weightUnit)}
+                        {formatWeight(
+                          exerciseVolume,
+                          exercise.sets[0]?.unit as 'kg' | 'lbs',
+                          settings.weightUnit,
+                        )}
                       </span>
                     </div>
                   )}

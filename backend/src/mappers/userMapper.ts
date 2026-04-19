@@ -28,9 +28,7 @@ const DEFAULT_SETTINGS: UserSettingsResponse = {
 
 // ── Mapper functions ────────────────────────────────────────────────────
 
-export function toUserSettingsResponse(
-  settings: Record<string, unknown>,
-): UserSettingsResponse {
+export function toUserSettingsResponse(settings: Record<string, unknown>): UserSettingsResponse {
   return {
     weightUnit: (settings.weightUnit as string) ?? DEFAULT_SETTINGS.weightUnit,
     distanceUnit: (settings.distanceUnit as string) ?? DEFAULT_SETTINGS.distanceUnit,
@@ -44,12 +42,8 @@ export function toUserProfileResponse(user: IUser): UserProfileResponse {
     id: user._id.toString(),
     displayName: user.displayName,
     email: user.email,
-    settings: toUserSettingsResponse(
-      (user.settings as Record<string, unknown>) || {},
-    ),
+    settings: toUserSettingsResponse((user.settings as Record<string, unknown>) || {}),
     createdAt:
-      user.createdAt instanceof Date
-        ? user.createdAt.toISOString()
-        : String(user.createdAt),
+      user.createdAt instanceof Date ? user.createdAt.toISOString() : String(user.createdAt),
   };
 }

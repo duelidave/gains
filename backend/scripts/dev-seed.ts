@@ -7,11 +7,21 @@
  */
 import mongoose from 'mongoose';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://admin:devsecret@localhost:27017/fitness?authSource=admin';
+const MONGO_URI =
+  process.env.MONGO_URI || 'mongodb://admin:devsecret@localhost:27017/fitness?authSource=admin';
 const USER_ID = process.argv[2] || 'dev-user';
 
-interface PlanExercise { name: string; setsReps: string; rest?: string; notes?: string }
-interface PlanSection { name: string; duration?: string; exercises: PlanExercise[] }
+interface PlanExercise {
+  name: string;
+  setsReps: string;
+  rest?: string;
+  notes?: string;
+}
+interface PlanSection {
+  name: string;
+  duration?: string;
+  exercises: PlanExercise[];
+}
 interface PlanDoc {
   userId: string;
   name: string;
@@ -25,55 +35,71 @@ const plans: PlanDoc[] = [
     userId: USER_ID,
     name: 'Push Day',
     workoutTitle: 'Brust',
-    sections: [{
-      name: 'Hauptteil',
-      exercises: [
-        { name: 'Bankdrücken', setsReps: '4x6-8', rest: '2min' },
-        { name: 'Schrägbankdrücken (KH)', setsReps: '3x8-10', rest: '90s' },
-        { name: 'Butterfly (Maschine)', setsReps: '3x12', rest: '60s' },
-        { name: 'Dips', setsReps: '3x10', rest: '60s' },
-        { name: 'Trizepsdrücken am Kabel', setsReps: '3x12', rest: '60s' },
-      ],
-    }],
+    sections: [
+      {
+        name: 'Hauptteil',
+        exercises: [
+          { name: 'Bankdrücken', setsReps: '4x6-8', rest: '2min' },
+          { name: 'Schrägbankdrücken (KH)', setsReps: '3x8-10', rest: '90s' },
+          { name: 'Butterfly (Maschine)', setsReps: '3x12', rest: '60s' },
+          { name: 'Dips', setsReps: '3x10', rest: '60s' },
+          { name: 'Trizepsdrücken am Kabel', setsReps: '3x12', rest: '60s' },
+        ],
+      },
+    ],
   },
   {
     userId: USER_ID,
     name: 'Pull Day',
     workoutTitle: 'Rücken',
-    sections: [{
-      name: 'Hauptteil',
-      exercises: [
-        { name: 'Kreuzheben', setsReps: '3x5', rest: '3min' },
-        { name: 'Klimmzüge', setsReps: '4x6-8', rest: '2min' },
-        { name: 'Rudern (KH)', setsReps: '3x10', rest: '90s' },
-        { name: 'Latzug', setsReps: '3x12', rest: '60s' },
-        { name: 'Bizeps Curls (KH)', setsReps: '3x12', rest: '60s' },
-      ],
-    }],
+    sections: [
+      {
+        name: 'Hauptteil',
+        exercises: [
+          { name: 'Kreuzheben', setsReps: '3x5', rest: '3min' },
+          { name: 'Klimmzüge', setsReps: '4x6-8', rest: '2min' },
+          { name: 'Rudern (KH)', setsReps: '3x10', rest: '90s' },
+          { name: 'Latzug', setsReps: '3x12', rest: '60s' },
+          { name: 'Bizeps Curls (KH)', setsReps: '3x12', rest: '60s' },
+        ],
+      },
+    ],
   },
   {
     userId: USER_ID,
     name: 'Leg Day',
     workoutTitle: 'Beine',
-    sections: [{
-      name: 'Hauptteil',
-      exercises: [
-        { name: 'Kniebeugen', setsReps: '4x6-8', rest: '2min' },
-        { name: 'Beinpresse', setsReps: '3x10', rest: '90s' },
-        { name: 'Rumänisches Kreuzheben', setsReps: '3x8', rest: '90s' },
-        { name: 'Beinstrecker', setsReps: '3x12', rest: '60s' },
-        { name: 'Wadenheben', setsReps: '4x15', rest: '45s' },
-      ],
-    }],
+    sections: [
+      {
+        name: 'Hauptteil',
+        exercises: [
+          { name: 'Kniebeugen', setsReps: '4x6-8', rest: '2min' },
+          { name: 'Beinpresse', setsReps: '3x10', rest: '90s' },
+          { name: 'Rumänisches Kreuzheben', setsReps: '3x8', rest: '90s' },
+          { name: 'Beinstrecker', setsReps: '3x12', rest: '60s' },
+          { name: 'Wadenheben', setsReps: '4x15', rest: '45s' },
+        ],
+      },
+    ],
   },
 ];
 
 const baseWeights: Record<string, number> = {
-  'Bankdrücken': 70, 'Schrägbankdrücken (KH)': 22, 'Butterfly (Maschine)': 40,
-  'Dips': 0, 'Trizepsdrücken am Kabel': 30,
-  'Kreuzheben': 100, 'Klimmzüge': 0, 'Rudern (KH)': 22, 'Latzug': 60, 'Bizeps Curls (KH)': 12,
-  'Kniebeugen': 80, 'Beinpresse': 120, 'Rumänisches Kreuzheben': 70,
-  'Beinstrecker': 50, 'Wadenheben': 60,
+  Bankdrücken: 70,
+  'Schrägbankdrücken (KH)': 22,
+  'Butterfly (Maschine)': 40,
+  Dips: 0,
+  'Trizepsdrücken am Kabel': 30,
+  Kreuzheben: 100,
+  Klimmzüge: 0,
+  'Rudern (KH)': 22,
+  Latzug: 60,
+  'Bizeps Curls (KH)': 12,
+  Kniebeugen: 80,
+  Beinpresse: 120,
+  'Rumänisches Kreuzheben': 70,
+  Beinstrecker: 50,
+  Wadenheben: 60,
 };
 
 function rand(min: number, max: number): number {
@@ -91,8 +117,14 @@ async function seed() {
   await mongoose.connect(MONGO_URI);
   console.log(`Connected to ${MONGO_URI}`);
 
-  const Workout = mongoose.model('Workout', new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'workouts' }));
-  const Plan = mongoose.model('TrainingPlan', new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'trainingplans' }));
+  const Workout = mongoose.model(
+    'Workout',
+    new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'workouts' }),
+  );
+  const Plan = mongoose.model(
+    'TrainingPlan',
+    new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'trainingplans' }),
+  );
 
   await Workout.deleteMany({ userId: USER_ID });
   await Plan.deleteMany({ userId: USER_ID });
@@ -114,9 +146,12 @@ async function seed() {
       const plan = plans[idx % plans.length];
       idx++;
       const weekOffset = Math.floor((cur.getTime() - start.getTime()) / (7 * 24 * 3600 * 1000));
-      const exercises = plan.sections[0].exercises.map(ex => {
+      const exercises = plan.sections[0].exercises.map((ex) => {
         const base = baseWeights[ex.name] ?? 20;
-        const weight = Math.max(0, Math.round((base + weekOffset * 0.5 + (Math.random() * 5 - 2.5)) / 2.5) * 2.5);
+        const weight = Math.max(
+          0,
+          Math.round((base + weekOffset * 0.5 + (Math.random() * 5 - 2.5)) / 2.5) * 2.5,
+        );
         const numSets = rand(3, 4);
         const sets: Array<Record<string, unknown>> = [];
         for (let i = 0; i < numSets; i++) {
@@ -134,7 +169,10 @@ async function seed() {
         userId: USER_ID,
         date: todayIso(date),
         title: plan.workoutTitle,
-        notes: Math.random() > 0.75 ? ['Gut gefühlt', 'Schwer', 'Neuer PR!', 'Deload', ''][rand(0, 4)] : '',
+        notes:
+          Math.random() > 0.75
+            ? ['Gut gefühlt', 'Schwer', 'Neuer PR!', 'Deload', ''][rand(0, 4)]
+            : '',
         exercises,
         duration: rand(35, 75),
       });
@@ -148,7 +186,7 @@ async function seed() {
   await mongoose.disconnect();
 }
 
-seed().catch(err => {
+seed().catch((err) => {
   console.error('Seed failed:', err);
   process.exit(1);
 });

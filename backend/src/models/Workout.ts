@@ -2,28 +2,28 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ISet {
   reps: number;
-  repsDisplay?: string;           // Original format for dropsets, e.g. "6+5"
-  weight: number;                 // Numeric weight (backward compat; max for dropsets)
-  weight_kg?: number | number[];  // Original weight_kg (array for dropsets)
-  type?: string;                  // e.g. "dropset"
-  duration_minutes?: number;      // For cardio exercises
-  duration_seconds?: number;      // For timed exercises (e.g. plank)
+  repsDisplay?: string; // Original format for dropsets, e.g. "6+5"
+  weight: number; // Numeric weight (backward compat; max for dropsets)
+  weight_kg?: number | number[]; // Original weight_kg (array for dropsets)
+  type?: string; // e.g. "dropset"
+  duration_minutes?: number; // For cardio exercises
+  duration_seconds?: number; // For timed exercises (e.g. plank)
   notes?: string;
-  unit?: string;                  // e.g. "kg" (from AI parse)
-  duration?: number;              // Duration in seconds (from AI parse)
-  distance?: number;              // Distance (from AI parse)
-  distanceUnit?: string;          // e.g. "km" (from AI parse)
+  unit?: string; // e.g. "kg" (from AI parse)
+  duration?: number; // Duration in seconds (from AI parse)
+  distance?: number; // Distance (from AI parse)
+  distanceUnit?: string; // e.g. "km" (from AI parse)
 }
 
 export interface IExercise {
   name: string;
   sets: ISet[];
   bodyweight?: boolean;
-  weight_unit?: string;           // "per_hand" | "per_side"
-  weight_kg?: number | null;      // Default weight at exercise level
+  weight_unit?: string; // "per_hand" | "per_side"
+  weight_kg?: number | null; // Default weight at exercise level
   rest_seconds?: number | null;
   notes?: string | null;
-  category?: string;              // "strength" | "cardio" | "bodyweight"
+  category?: string; // "strength" | "cardio" | "bodyweight"
 }
 
 export interface IWorkout extends Document {
@@ -52,7 +52,7 @@ const setSchema = new Schema(
     distance: { type: Number },
     distanceUnit: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const exerciseSchema = new Schema(
@@ -66,7 +66,7 @@ const exerciseSchema = new Schema(
     notes: { type: String },
     category: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const workoutSchema = new Schema(
@@ -78,7 +78,7 @@ const workoutSchema = new Schema(
     exercises: { type: [exerciseSchema], default: [] },
     duration: { type: Number, default: 0 },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 workoutSchema.index({ userId: 1, date: -1 });

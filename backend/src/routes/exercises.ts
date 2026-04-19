@@ -16,18 +16,22 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
 });
 
 // POST /api/exercises/merge — merge one exercise name into another
-router.post('/merge', validateBody(mergeExercisesSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const { from, to } = req.body;
-    if (from === to) {
-      res.json({ modified: 0 });
-      return;
+router.post(
+  '/merge',
+  validateBody(mergeExercisesSchema),
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const { from, to } = req.body;
+      if (from === to) {
+        res.json({ modified: 0 });
+        return;
+      }
+      const modified = await ExerciseService.merge(req.user!.keycloakId, from, to);
+      res.json({ modified });
+    } catch (err) {
+      next(err);
     }
-    const modified = await ExerciseService.merge(req.user!.keycloakId, from, to);
-    res.json({ modified });
-  } catch (err) {
-    next(err);
-  }
-});
+  },
+);
 
 export default router;

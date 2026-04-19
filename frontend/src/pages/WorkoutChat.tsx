@@ -1,6 +1,20 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Check, Loader2, RotateCcw, ChevronDown, ChevronUp, Plus, Timer, Dumbbell, X, Undo2, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Send,
+  Check,
+  Loader2,
+  RotateCcw,
+  ChevronDown,
+  ChevronUp,
+  Plus,
+  Timer,
+  Dumbbell,
+  X,
+  Undo2,
+  Trash2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '../components/ui/Skeleton';
 import {
@@ -69,38 +83,42 @@ function detectWorkoutTitle(message: string, plans?: TrainingPlan[]): string | n
   const lower = message.toLowerCase();
   if (plans && plans.length > 0) {
     for (const plan of plans) {
-      if (lower.includes(plan.name.toLowerCase()) || lower.includes(plan.workoutTitle.toLowerCase())) {
+      if (
+        lower.includes(plan.name.toLowerCase()) ||
+        lower.includes(plan.workoutTitle.toLowerCase())
+      ) {
         return plan.workoutTitle;
       }
     }
   }
   if (lower.includes('brust') || lower.includes('chest')) return 'Brust';
-  if (lower.includes('rücken') || lower.includes('ruecken') || lower.includes('back')) return 'Rücken';
+  if (lower.includes('rücken') || lower.includes('ruecken') || lower.includes('back'))
+    return 'Rücken';
   if (lower.includes('bein') || lower.includes('leg')) return 'Beine';
   return null;
 }
 
 function summarizeSets(sets: ApiSet[], targetUnit: 'kg' | 'lbs'): string {
   if (sets.length === 0) return '';
-  const hasDuration = sets.some(s => (s.duration ?? 0) > 0);
+  const hasDuration = sets.some((s) => (s.duration ?? 0) > 0);
   if (hasDuration) {
-    const durations = sets.map(s => s.duration ?? 0);
-    const allSame = durations.every(d => d === durations[0]);
+    const durations = sets.map((s) => s.duration ?? 0);
+    const allSame = durations.every((d) => d === durations[0]);
     if (allSame) return `${sets.length}x ${formatDuration(durations[0])}`;
-    return sets.map(s => formatDuration(s.duration ?? 0)).join(', ');
+    return sets.map((s) => formatDuration(s.duration ?? 0)).join(', ');
   }
   const reps = sets[0].reps;
   const weight = sets[0].weight;
-  const allSame = sets.every(s => s.reps === reps && s.weight === weight);
+  const allSame = sets.every((s) => s.reps === reps && s.weight === weight);
   if (allSame && weight > 0) {
     return `${sets.length}x${reps} @ ${formatWeight(weight, (sets[0].unit || 'kg') as 'kg' | 'lbs', targetUnit)}`;
   }
   if (allSame) return `${sets.length}x${reps}`;
-  return sets.map(s => s.weight > 0 ? `${s.reps}@${s.weight}` : `${s.reps}`).join(', ');
+  return sets.map((s) => (s.weight > 0 ? `${s.reps}@${s.weight}` : `${s.reps}`)).join(', ');
 }
 
 function summarizeConfirmedEntries(sets: SetEntry[], targetUnit: 'kg' | 'lbs'): string {
-  const apiSets: ApiSet[] = sets.map(s => ({
+  const apiSets: ApiSet[] = sets.map((s) => ({
     reps: Number(s.reps) || 0,
     weight: Number(s.weight) || 0,
     unit: s.unit,
@@ -146,7 +164,7 @@ export default function WorkoutChat() {
   const hadSavedDraftRef = useRef(false);
 
   const selectedPlan = useMemo(
-    () => (planId ? plans.find(p => p._id === planId) ?? null : null),
+    () => (planId ? (plans.find((p) => p._id === planId) ?? null) : null),
     [planId, plans],
   );
 
@@ -165,7 +183,9 @@ export default function WorkoutChat() {
   const nextOrder = () => orderRef.current++;
 
   useEffect(() => {
-    getPlans().then(setPlans).catch(() => {});
+    getPlans()
+      .then(setPlans)
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -178,7 +198,7 @@ export default function WorkoutChat() {
           if (typeof s.title === 'string') setTitle(s.title);
           if (typeof s.planId === 'string' || s.planId === null) setPlanId(s.planId ?? null);
           if (Array.isArray(s.skipped)) setSkipped(s.skipped);
-          const arr = (Array.isArray(s.entries) ? (s.entries as Entry[]) : []);
+          const arr = Array.isArray(s.entries) ? (s.entries as Entry[]) : [];
           const maxOrder = arr.reduce((m, e) => Math.max(m, e.order), -1);
           orderRef.current = maxOrder + 1;
           if (arr.length > 0 || s.title || s.planId) {
@@ -230,24 +250,24 @@ export default function WorkoutChat() {
     }
   }, [entries]);
 
-  const getLastExerciseData = useCallback((exerciseName: string) => {
-    if (!lastWorkout) return null;
-    return lastWorkout.exercises.find(
-      e => e.name.toLowerCase() === exerciseName.toLowerCase(),
-    ) ?? null;
-  }, [lastWorkout]);
+  const getLastExerciseData = useCallback(
+    (exerciseName: string) => {
+      if (!lastWorkout) return null;
+      return (
+        lastWorkout.exercises.find((e) => e.name.toLowerCase() === exerciseName.toLowerCase()) ??
+        null
+      );
+    },
+    [lastWorkout],
+  );
 
   const getSetsFor = useCallback(
     (name: string) =>
       entries.filter(
-        (e): e is SetEntry => e.kind === 'set' && normalizeName(e.exerciseName) === normalizeName(name),
+        (e): e is SetEntry =>
+          e.kind === 'set' && normalizeName(e.exerciseName) === normalizeName(name),
       ),
     [entries],
-  );
-
-  const isExerciseUsed = useCallback(
-    (name: string) => getSetsFor(name).some(e => e.confirmed),
-    [getSetsFor],
   );
 
   const startDraftFromPlan = (plan: TrainingPlan) => {
@@ -271,14 +291,14 @@ export default function WorkoutChat() {
     if (!text) return;
     if (!started) {
       const detected = detectWorkoutTitle(text, plans);
-      const plan = detected ? plans.find(p => p.workoutTitle === detected) : undefined;
+      const plan = detected ? plans.find((p) => p.workoutTitle === detected) : undefined;
       setTitle(detected ?? '');
       setPlanId(plan?._id ?? null);
       setStarted(true);
       if (detected) fetchLastWorkout(detected);
     }
     const note: NoteEntry = { id: newId(), order: nextOrder(), kind: 'note', text };
-    setEntries(prev => [...prev, note]);
+    setEntries((prev) => [...prev, note]);
     setInput('');
     setError('');
   };
@@ -291,33 +311,35 @@ export default function WorkoutChat() {
   };
 
   const deleteEntry = (id: string) => {
-    setEntries(prev => prev.filter(e => e.id !== id));
+    setEntries((prev) => prev.filter((e) => e.id !== id));
   };
 
   const skipExercise = (name: string) => {
-    setSkipped(prev => (prev.includes(name) ? prev : [...prev, name]));
+    setSkipped((prev) => (prev.includes(name) ? prev : [...prev, name]));
     if (expandedExercise === name) setExpandedExercise(null);
   };
 
   const unskipExercise = (name: string) => {
-    setSkipped(prev => prev.filter(n => n !== name));
+    setSkipped((prev) => prev.filter((n) => n !== name));
   };
 
   const seedSetsFromLast = (name: string): SetEntry[] => {
     const last = getLastExerciseData(name);
     if (!last || last.sets.length === 0) {
-      return [{
-        id: newId(),
-        order: nextOrder(),
-        kind: 'set',
-        exerciseName: name,
-        reps: '',
-        weight: '',
-        unit: settings.weightUnit,
-        confirmed: false,
-      }];
+      return [
+        {
+          id: newId(),
+          order: nextOrder(),
+          kind: 'set',
+          exerciseName: name,
+          reps: '',
+          weight: '',
+          unit: settings.weightUnit,
+          confirmed: false,
+        },
+      ];
     }
-    return last.sets.map(s => ({
+    return last.sets.map((s) => ({
       id: newId(),
       order: nextOrder(),
       kind: 'set' as const,
@@ -336,16 +358,18 @@ export default function WorkoutChat() {
     }
     if (getSetsFor(name).length === 0) {
       const seeded = seedSetsFromLast(name);
-      setEntries(prev => [...prev, ...seeded]);
+      setEntries((prev) => [...prev, ...seeded]);
     }
     setExpandedExercise(name);
   };
 
   const updateSetEntry = (id: string, field: 'reps' | 'weight', value: string) => {
-    setEntries(prev => prev.map(e => {
-      if (e.id !== id || e.kind !== 'set') return e;
-      return { ...e, [field]: value };
-    }));
+    setEntries((prev) =>
+      prev.map((e) => {
+        if (e.id !== id || e.kind !== 'set') return e;
+        return { ...e, [field]: value };
+      }),
+    );
   };
 
   const addSetRow = (name: string) => {
@@ -372,45 +396,46 @@ export default function WorkoutChat() {
       unit: settings.weightUnit,
       confirmed: false,
     };
-    setEntries(prev => [...prev, entry]);
+    setEntries((prev) => [...prev, entry]);
   };
 
   const toggleConfirmSet = (id: string) => {
-    setEntries(prev => prev.map(e => {
-      if (e.id !== id || e.kind !== 'set') return e;
-      if (!e.confirmed) {
-        const reps = Number(e.reps);
-        if (!Number.isFinite(reps) || reps <= 0) return e;
-      }
-      return { ...e, confirmed: !e.confirmed };
-    }));
+    setEntries((prev) =>
+      prev.map((e) => {
+        if (e.id !== id || e.kind !== 'set') return e;
+        if (!e.confirmed) {
+          const reps = Number(e.reps);
+          if (!Number.isFinite(reps) || reps <= 0) return e;
+        }
+        return { ...e, confirmed: !e.confirmed };
+      }),
+    );
   };
 
   const buildWorkoutFromEntries = (): WorkoutInput | null => {
     const sorted = [...entries].sort((a, b) => a.order - b.order);
-    const confirmedSets = sorted.filter(
-      (e): e is SetEntry => e.kind === 'set' && e.confirmed,
-    );
+    const confirmedSets = sorted.filter((e): e is SetEntry => e.kind === 'set' && e.confirmed);
     if (confirmedSets.length === 0) return null;
 
-    const notes = sorted.filter((e): e is NoteEntry => e.kind === 'note').map(n => n.text);
+    const notes = sorted.filter((e): e is NoteEntry => e.kind === 'note').map((n) => n.text);
 
     const grouped = new Map<string, { name: string; sets: ApiSet[] }>();
     for (const s of confirmedSets) {
       const key = normalizeName(s.exerciseName);
-      const set: ApiSet = s.duration && s.duration.trim()
-        ? { reps: 0, weight: 0, unit: s.unit, duration: Number(s.duration) || 0 }
-        : {
-          reps: Number(s.reps) || 0,
-          weight: Number(s.weight) || 0,
-          unit: s.unit,
-        };
+      const set: ApiSet =
+        s.duration && s.duration.trim()
+          ? { reps: 0, weight: 0, unit: s.unit, duration: Number(s.duration) || 0 }
+          : {
+              reps: Number(s.reps) || 0,
+              weight: Number(s.weight) || 0,
+              unit: s.unit,
+            };
       const bucket = grouped.get(key);
       if (bucket) bucket.sets.push(set);
       else grouped.set(key, { name: s.exerciseName, sets: [set] });
     }
 
-    const exercises: ApiExercise[] = [...grouped.values()].map(g => ({
+    const exercises: ApiExercise[] = [...grouped.values()].map((g) => ({
       name: g.name,
       sets: g.sets,
     }));
@@ -502,50 +527,49 @@ export default function WorkoutChat() {
           >
             <ArrowLeft size={18} />
           </button>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">{t('workoutChat.newWorkout')}</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+            {t('workoutChat.newWorkout')}
+          </h1>
         </div>
         <div className="flex-1 overflow-y-auto space-y-4 py-6">
-          <p className="text-slate-500 text-sm text-center">
-            {t('workoutChat.chooseType')}
-          </p>
+          <p className="text-slate-500 text-sm text-center">{t('workoutChat.chooseType')}</p>
           <div className="flex flex-col gap-2 w-full max-w-sm mx-auto">
-            {plans.length > 0 ? (
-              plans.map((plan) => (
-                <button
-                  key={plan._id}
-                  onClick={() => startDraftFromPlan(plan)}
-                  className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800/50 active:scale-[0.98] transition-all flex items-center gap-3"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
-                    <Dumbbell size={18} />
-                  </div>
-                  <div className="text-left">
-                    <span className="block font-bold">{plan.name}</span>
-                    <span className="text-xs text-slate-500">
-                      {plan.sections.flatMap(s => s.exercises).length} {t('workoutChat.exercises', { count: plan.sections.flatMap(s => s.exercises).length })}
-                    </span>
-                  </div>
-                </button>
-              ))
-            ) : (
-              [
-                { key: 'chest', label: t('workoutChat.chest'), title: 'Brust' },
-                { key: 'back', label: t('workoutChat.back'), title: 'Rücken' },
-                { key: 'legs', label: t('workoutChat.legs'), title: 'Beine' },
-              ].map(({ key, label, title: titleLabel }) => (
-                <button
-                  key={key}
-                  onClick={() => startDraftFromTitle(titleLabel)}
-                  className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800/50 active:scale-[0.98] transition-all"
-                >
-                  {label}
-                </button>
-              ))
-            )}
+            {plans.length > 0
+              ? plans.map((plan) => (
+                  <button
+                    key={plan._id}
+                    onClick={() => startDraftFromPlan(plan)}
+                    className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800/50 active:scale-[0.98] transition-all flex items-center gap-3"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                      <Dumbbell size={18} />
+                    </div>
+                    <div className="text-left">
+                      <span className="block font-bold">{plan.name}</span>
+                      <span className="text-xs text-slate-500">
+                        {plan.sections.flatMap((s) => s.exercises).length}{' '}
+                        {t('workoutChat.exercises', {
+                          count: plan.sections.flatMap((s) => s.exercises).length,
+                        })}
+                      </span>
+                    </div>
+                  </button>
+                ))
+              : [
+                  { key: 'chest', label: t('workoutChat.chest'), title: 'Brust' },
+                  { key: 'back', label: t('workoutChat.back'), title: 'Rücken' },
+                  { key: 'legs', label: t('workoutChat.legs'), title: 'Beine' },
+                ].map(({ key, label, title: titleLabel }) => (
+                  <button
+                    key={key}
+                    onClick={() => startDraftFromTitle(titleLabel)}
+                    className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800/50 active:scale-[0.98] transition-all"
+                  >
+                    {label}
+                  </button>
+                ))}
           </div>
-          <p className="text-slate-600 text-xs text-center">
-            {t('workoutChat.example')}
-          </p>
+          <p className="text-slate-600 text-xs text-center">{t('workoutChat.example')}</p>
         </div>
         <div className="sticky bottom-0 bg-white dark:bg-slate-950 pt-3">
           <div className="bg-slate-50 dark:bg-slate-900/30 rounded-xl p-3 border border-dashed border-slate-300 dark:border-slate-800">
@@ -573,9 +597,9 @@ export default function WorkoutChat() {
     );
   }
 
-  const planExercises = selectedPlan ? selectedPlan.sections.flatMap(s => s.exercises) : [];
-  const hasConfirmedSets = entries.some(e => e.kind === 'set' && e.confirmed);
-  const hasNotes = entries.some(e => e.kind === 'note');
+  const planExercises = selectedPlan ? selectedPlan.sections.flatMap((s) => s.exercises) : [];
+  const hasConfirmedSets = entries.some((e) => e.kind === 'set' && e.confirmed);
+  const hasNotes = entries.some((e) => e.kind === 'note');
   const canFinish = hasConfirmedSets || hasNotes;
   const finishDisabled = !canFinish || saving;
   const sortedEntries = [...entries].sort((a, b) => a.order - b.order);
@@ -591,12 +615,18 @@ export default function WorkoutChat() {
             <ArrowLeft size={18} />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">{t('workoutChat.newWorkout')}</h1>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+              {t('workoutChat.newWorkout')}
+            </h1>
             {selectedPlan && (
-              <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">{selectedPlan.name}</span>
+              <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                {selectedPlan.name}
+              </span>
             )}
             {!selectedPlan && title && (
-              <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">{title}</span>
+              <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                {title}
+              </span>
             )}
           </div>
         </div>
@@ -615,13 +645,16 @@ export default function WorkoutChat() {
             {lastWorkoutLoading && <Skeleton className="h-16 rounded-xl" />}
             {planExercises.map((ex, i) => {
               const sets = getSetsFor(ex.name);
-              const used = sets.some(s => s.confirmed);
+              const used = sets.some((s) => s.confirmed);
               const isSkipped = skipped.includes(ex.name);
               const lastEx = getLastExerciseData(ex.name);
               const lastSummary = lastEx ? summarizeSets(lastEx.sets, settings.weightUnit) : null;
               const isExpanded = expandedExercise === ex.name;
               const confirmedSummary = used
-                ? summarizeConfirmedEntries(sets.filter(s => s.confirmed), settings.weightUnit)
+                ? summarizeConfirmedEntries(
+                    sets.filter((s) => s.confirmed),
+                    settings.weightUnit,
+                  )
                 : '';
 
               if (isSkipped) {
@@ -662,18 +695,16 @@ export default function WorkoutChat() {
                       onClick={() => expandExercise(ex.name)}
                       className="flex-1 p-4 flex items-center gap-3 text-left"
                     >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        used
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : isExpanded
-                            ? 'bg-indigo-500/20 text-indigo-400'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                      }`}>
-                        {used ? (
-                          <Check size={14} strokeWidth={3} />
-                        ) : (
-                          <Dumbbell size={14} />
-                        )}
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          used
+                            ? 'bg-emerald-500/20 text-emerald-400'
+                            : isExpanded
+                              ? 'bg-indigo-500/20 text-indigo-400'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        }`}
+                      >
+                        {used ? <Check size={14} strokeWidth={3} /> : <Dumbbell size={14} />}
                       </div>
                       <div>
                         <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">
@@ -682,8 +713,7 @@ export default function WorkoutChat() {
                         <p className="text-xs text-slate-500 font-mono">
                           {used
                             ? confirmedSummary
-                            : ex.setsReps || (lastSummary ? `Last: ${lastSummary}` : '')
-                          }
+                            : ex.setsReps || (lastSummary ? `Last: ${lastSummary}` : '')}
                         </p>
                       </div>
                     </button>
@@ -700,10 +730,11 @@ export default function WorkoutChat() {
                           <X size={14} />
                         </button>
                       )}
-                      {isExpanded
-                        ? <ChevronUp size={16} className="text-slate-400" />
-                        : <ChevronDown size={16} className="text-slate-600" />
-                      }
+                      {isExpanded ? (
+                        <ChevronUp size={16} className="text-slate-400" />
+                      ) : (
+                        <ChevronDown size={16} className="text-slate-600" />
+                      )}
                     </div>
                   </div>
 
@@ -731,29 +762,35 @@ export default function WorkoutChat() {
                               : 'bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800'
                           }`}
                         >
-                          <div className="w-6 font-mono text-xs text-slate-500 font-bold">{si + 1}</div>
+                          <div className="w-6 font-mono text-xs text-slate-500 font-bold">
+                            {si + 1}
+                          </div>
                           <div className="flex-1 grid grid-cols-2 gap-2">
                             <div className="relative">
                               <input
                                 type="number"
                                 inputMode="decimal"
                                 value={row.weight}
-                                onChange={e => updateSetEntry(row.id, 'weight', e.target.value)}
+                                onChange={(e) => updateSetEntry(row.id, 'weight', e.target.value)}
                                 placeholder="kg"
                                 className="w-full bg-white dark:bg-slate-900 border-none rounded-md text-sm font-mono text-center focus:ring-1 focus:ring-indigo-500 py-2 text-slate-900 dark:text-slate-50"
                               />
-                              <span className="absolute right-2 top-2.5 text-[10px] text-slate-600 font-bold">KG</span>
+                              <span className="absolute right-2 top-2.5 text-[10px] text-slate-600 font-bold">
+                                KG
+                              </span>
                             </div>
                             <div className="relative">
                               <input
                                 type="number"
                                 inputMode="numeric"
                                 value={row.reps}
-                                onChange={e => updateSetEntry(row.id, 'reps', e.target.value)}
+                                onChange={(e) => updateSetEntry(row.id, 'reps', e.target.value)}
                                 placeholder="reps"
                                 className="w-full bg-white dark:bg-slate-900 border-none rounded-md text-sm font-mono text-center focus:ring-1 focus:ring-indigo-500 py-2 text-slate-900 dark:text-slate-50"
                               />
-                              <span className="absolute right-2 top-2.5 text-[10px] text-slate-600 font-bold">REPS</span>
+                              <span className="absolute right-2 top-2.5 text-[10px] text-slate-600 font-bold">
+                                REPS
+                              </span>
                             </div>
                           </div>
                           <button
@@ -823,15 +860,18 @@ export default function WorkoutChat() {
                 );
               }
               if (!e.confirmed) return null;
-              const summary = e.duration && e.duration.trim()
-                ? e.duration
-                : e.weight && Number(e.weight) > 0
-                  ? `${e.reps}x ${e.weight}${e.unit}`
-                  : `${e.reps}x`;
+              const summary =
+                e.duration && e.duration.trim()
+                  ? e.duration
+                  : e.weight && Number(e.weight) > 0
+                    ? `${e.reps}x ${e.weight}${e.unit}`
+                    : `${e.reps}x`;
               return (
                 <div key={e.id} className="flex justify-end">
                   <div className="flex items-center gap-2 bg-emerald-100 text-emerald-800 dark:bg-emerald-600/20 dark:text-emerald-300 rounded-lg px-3 py-1.5 text-xs max-w-[80%] font-mono">
-                    <span className="break-all">{e.exerciseName} — {summary}</span>
+                    <span className="break-all">
+                      {e.exerciseName} — {summary}
+                    </span>
                     <button
                       onClick={() => deleteEntry(e.id)}
                       className="text-emerald-400 hover:text-red-400 transition-colors"

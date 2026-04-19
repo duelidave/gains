@@ -1,5 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Plus, ArrowLeft, Edit, Trash2, ChevronDown, ChevronUp, ChevronRight, X, Zap, Dumbbell, Timer, BookOpen, Sparkles, Loader2, Send } from 'lucide-react';
+import {
+  Plus,
+  ArrowLeft,
+  Edit,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  X,
+  Zap,
+  Dumbbell,
+  Timer,
+  BookOpen,
+  Sparkles,
+  Loader2,
+  Send,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -40,10 +56,13 @@ function planToForm(plan: TrainingPlan): PlanFormData {
   return {
     name: plan.name,
     workoutTitle: plan.workoutTitle,
-    sections: plan.sections.length > 0 ? plan.sections.map(s => ({
-      ...s,
-      exercises: s.exercises.length > 0 ? [...s.exercises] : [emptyExercise()],
-    })) : [emptySection()],
+    sections:
+      plan.sections.length > 0
+        ? plan.sections.map((s) => ({
+            ...s,
+            exercises: s.exercises.length > 0 ? [...s.exercises] : [emptyExercise()],
+          }))
+        : [emptySection()],
     progressionNotes: plan.progressionNotes || '',
   };
 }
@@ -89,7 +108,9 @@ export default function Plans() {
     setForm(planToForm(plan));
     setSelectedPlan(plan);
     const expanded: Record<number, boolean> = {};
-    plan.sections.forEach((_, i) => { expanded[i] = true; });
+    plan.sections.forEach((_, i) => {
+      expanded[i] = true;
+    });
     setExpandedSections(expanded);
     setViewState('edit');
     setError('');
@@ -146,39 +167,42 @@ export default function Plans() {
 
   // Section helpers
   const updateSection = (idx: number, updates: Partial<PlanSection>) => {
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
-      sections: f.sections.map((s, i) => i === idx ? { ...s, ...updates } : s),
+      sections: f.sections.map((s, i) => (i === idx ? { ...s, ...updates } : s)),
     }));
   };
 
   const addSection = () => {
-    setForm(f => ({ ...f, sections: [...f.sections, emptySection()] }));
-    setExpandedSections(prev => ({ ...prev, [form.sections.length]: true }));
+    setForm((f) => ({ ...f, sections: [...f.sections, emptySection()] }));
+    setExpandedSections((prev) => ({ ...prev, [form.sections.length]: true }));
   };
 
   const removeSection = (idx: number) => {
     if (form.sections.length <= 1) return;
-    setForm(f => ({ ...f, sections: f.sections.filter((_, i) => i !== idx) }));
+    setForm((f) => ({ ...f, sections: f.sections.filter((_, i) => i !== idx) }));
   };
 
   // Exercise helpers
   const updateExercise = (sIdx: number, eIdx: number, updates: Partial<PlanExercise>) => {
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
       sections: f.sections.map((s, si) =>
         si === sIdx
-          ? { ...s, exercises: s.exercises.map((e, ei) => ei === eIdx ? { ...e, ...updates } : e) }
-          : s
+          ? {
+              ...s,
+              exercises: s.exercises.map((e, ei) => (ei === eIdx ? { ...e, ...updates } : e)),
+            }
+          : s,
       ),
     }));
   };
 
   const addExercise = (sIdx: number) => {
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
       sections: f.sections.map((s, si) =>
-        si === sIdx ? { ...s, exercises: [...s.exercises, emptyExercise()] } : s
+        si === sIdx ? { ...s, exercises: [...s.exercises, emptyExercise()] } : s,
       ),
     }));
   };
@@ -186,23 +210,26 @@ export default function Plans() {
   const removeExercise = (sIdx: number, eIdx: number) => {
     const section = form.sections[sIdx];
     if (section.exercises.length <= 1) return;
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
       sections: f.sections.map((s, si) =>
-        si === sIdx ? { ...s, exercises: s.exercises.filter((_, ei) => ei !== eIdx) } : s
+        si === sIdx ? { ...s, exercises: s.exercises.filter((_, ei) => ei !== eIdx) } : s,
       ),
     }));
   };
 
   const toggleSection = (idx: number) => {
-    setExpandedSections(prev => ({ ...prev, [idx]: !prev[idx] }));
+    setExpandedSections((prev) => ({ ...prev, [idx]: !prev[idx] }));
   };
 
   const totalExercises = (plan: TrainingPlan) =>
     plan.sections.reduce((sum, s) => sum + s.exercises.length, 0);
 
   const sectionPreview = (plan: TrainingPlan) =>
-    plan.sections.map(s => s.name).filter(Boolean).join(', ');
+    plan.sections
+      .map((s) => s.name)
+      .filter(Boolean)
+      .join(', ');
 
   /** Estimate total workout duration in minutes */
   const estimateDuration = (plan: TrainingPlan): number => {
@@ -250,18 +277,22 @@ export default function Plans() {
       setForm({
         name: generated.name,
         workoutTitle: generated.workoutTitle,
-        sections: generated.sections.map(s => ({
+        sections: generated.sections.map((s) => ({
           ...s,
-          exercises: s.exercises.map(e => ({ ...e })),
+          exercises: s.exercises.map((e) => ({ ...e })),
         })),
         progressionNotes: generated.progressionNotes || '',
       });
       const expanded: Record<number, boolean> = {};
-      generated.sections.forEach((_, i) => { expanded[i] = true; });
+      generated.sections.forEach((_, i) => {
+        expanded[i] = true;
+      });
       setExpandedSections(expanded);
       setViewState('create');
     } catch {
-      setError(t('plans.failedToGenerate', { defaultValue: 'Failed to generate plan. Please try again.' }));
+      setError(
+        t('plans.failedToGenerate', { defaultValue: 'Failed to generate plan. Please try again.' }),
+      );
     } finally {
       setAiGenerating(false);
     }
@@ -273,7 +304,11 @@ export default function Plans() {
       <div className="space-y-6 max-w-2xl mx-auto">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => { setViewState('list'); setAiPrompt(''); setError(''); }}
+            onClick={() => {
+              setViewState('list');
+              setAiPrompt('');
+              setError('');
+            }}
             className="text-indigo-600 dark:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors"
           >
             <ArrowLeft size={18} />
@@ -283,7 +318,9 @@ export default function Plans() {
               {t('plans.aiGenerate', { defaultValue: 'AI Plan Generator' })}
             </h1>
             <p className="text-sm text-slate-500">
-              {t('plans.aiGenerateDescription', { defaultValue: 'Describe your training goals and get a plan.' })}
+              {t('plans.aiGenerateDescription', {
+                defaultValue: 'Describe your training goals and get a plan.',
+              })}
             </p>
           </div>
         </div>
@@ -296,7 +333,10 @@ export default function Plans() {
             <textarea
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder={t('plans.aiPlaceholder', { defaultValue: 'e.g., "Erstelle einen Push/Pull/Legs Plan für Hypertrophie, 3x pro Woche. Fokus auf Brust und Rücken."' })}
+              placeholder={t('plans.aiPlaceholder', {
+                defaultValue:
+                  'e.g., "Erstelle einen Push/Pull/Legs Plan für Hypertrophie, 3x pro Woche. Fokus auf Brust und Rücken."',
+              })}
               rows={4}
               className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
             />
@@ -307,10 +347,28 @@ export default function Plans() {
               {t('plans.aiTips', { defaultValue: 'Tips for better results' })}
             </p>
             <ul className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
-              <li>• {t('plans.aiTip1', { defaultValue: 'Mention your split (PPL, Upper/Lower, Full Body, ...)' })}</li>
-              <li>• {t('plans.aiTip2', { defaultValue: 'Specify your goal (Hypertrophie, Kraft, Ausdauer)' })}</li>
-              <li>• {t('plans.aiTip3', { defaultValue: 'Add constraints (equipment, time, injuries)' })}</li>
-              <li>• {t('plans.aiTip4', { defaultValue: 'Mention focus areas (more chest, less legs, ...)' })}</li>
+              <li>
+                •{' '}
+                {t('plans.aiTip1', {
+                  defaultValue: 'Mention your split (PPL, Upper/Lower, Full Body, ...)',
+                })}
+              </li>
+              <li>
+                •{' '}
+                {t('plans.aiTip2', {
+                  defaultValue: 'Specify your goal (Hypertrophie, Kraft, Ausdauer)',
+                })}
+              </li>
+              <li>
+                •{' '}
+                {t('plans.aiTip3', { defaultValue: 'Add constraints (equipment, time, injuries)' })}
+              </li>
+              <li>
+                •{' '}
+                {t('plans.aiTip4', {
+                  defaultValue: 'Mention focus areas (more chest, less legs, ...)',
+                })}
+              </li>
             </ul>
           </div>
 
@@ -360,13 +418,19 @@ export default function Plans() {
           {/* Plan header */}
           <div className="p-4 bg-indigo-500/5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
             <div>
-              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-lg">{selectedPlan.name}</h3>
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-lg">
+                {selectedPlan.name}
+              </h3>
               <div className="flex items-center gap-2 text-xs text-indigo-400/80 flex-wrap">
                 <span>{selectedPlan.workoutTitle}</span>
                 <span className="w-1 h-1 rounded-full bg-indigo-400/40"></span>
-                <span className="flex items-center gap-1"><Timer size={12} /> {formatEstimatedDuration(estimateDuration(selectedPlan))}</span>
+                <span className="flex items-center gap-1">
+                  <Timer size={12} /> {formatEstimatedDuration(estimateDuration(selectedPlan))}
+                </span>
                 <span className="w-1 h-1 rounded-full bg-indigo-400/40"></span>
-                <span>{totalExercises(selectedPlan)} {t('common.exercises')}</span>
+                <span>
+                  {totalExercises(selectedPlan)} {t('common.exercises')}
+                </span>
               </div>
             </div>
             <div className="flex gap-1">
@@ -391,21 +455,33 @@ export default function Plans() {
             const isExpanded = expandedSections[sIdx];
 
             return (
-              <div key={sIdx} className="border-b border-slate-200 dark:border-slate-800 last:border-b-0">
+              <div
+                key={sIdx}
+                className="border-b border-slate-200 dark:border-slate-800 last:border-b-0"
+              >
                 <button
                   className={`w-full p-4 flex items-center justify-between transition-colors ${
-                    isExpanded ? 'bg-slate-50 dark:bg-slate-50 dark:bg-slate-800/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800/20'
+                    isExpanded
+                      ? 'bg-slate-50 dark:bg-slate-50 dark:bg-slate-800/30'
+                      : 'hover:bg-slate-50 dark:hover:bg-slate-800/20'
                   }`}
                   onClick={() => toggleSection(sIdx)}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      isExpanded ? 'bg-indigo-500/20' : 'bg-slate-100 dark:bg-slate-800'
-                    }`}>
-                      <Icon size={16} className={isExpanded ? 'text-indigo-400' : 'text-slate-400'} />
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        isExpanded ? 'bg-indigo-500/20' : 'bg-slate-100 dark:bg-slate-800'
+                      }`}
+                    >
+                      <Icon
+                        size={16}
+                        className={isExpanded ? 'text-indigo-400' : 'text-slate-400'}
+                      />
                     </div>
                     <div className="text-left">
-                      <span className={`font-bold ${isExpanded ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'}`}>
+                      <span
+                        className={`font-bold ${isExpanded ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'}`}
+                      >
                         {section.name}
                       </span>
                       {section.duration && (
@@ -413,23 +489,31 @@ export default function Plans() {
                       )}
                     </div>
                   </div>
-                  {isExpanded
-                    ? <ChevronUp size={16} className="text-slate-400" />
-                    : <ChevronDown size={16} className="text-slate-600" />
-                  }
+                  {isExpanded ? (
+                    <ChevronUp size={16} className="text-slate-400" />
+                  ) : (
+                    <ChevronDown size={16} className="text-slate-600" />
+                  )}
                 </button>
 
                 {isExpanded && (
                   <div className="px-4 py-2 space-y-1">
                     {section.exercises.map((ex, eIdx) => (
-                      <div key={eIdx} className="py-3 flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/50 last:border-b-0">
+                      <div
+                        key={eIdx}
+                        className="py-3 flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/50 last:border-b-0"
+                      >
                         <div>
-                          <p className="font-semibold text-sm text-slate-800 dark:text-slate-200">{ex.name}</p>
+                          <p className="font-semibold text-sm text-slate-800 dark:text-slate-200">
+                            {ex.name}
+                          </p>
                           <p className="text-xs text-slate-500 tabular-nums">
                             {ex.setsReps}
                             {ex.rest ? ` \u2022 ${ex.rest} ${t('plans.rest')}` : ''}
                           </p>
-                          {ex.notes && <p className="text-xs text-slate-600 italic mt-0.5">{ex.notes}</p>}
+                          {ex.notes && (
+                            <p className="text-xs text-slate-600 italic mt-0.5">{ex.notes}</p>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -443,8 +527,12 @@ export default function Plans() {
         {/* Progression notes */}
         {selectedPlan.progressionNotes && (
           <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">{t('plans.progression')}</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line">{selectedPlan.progressionNotes}</p>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">
+              {t('plans.progression')}
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line">
+              {selectedPlan.progressionNotes}
+            </p>
           </div>
         )}
 
@@ -471,21 +559,35 @@ export default function Plans() {
                       setForm({
                         name: generated.name,
                         workoutTitle: generated.workoutTitle,
-                        sections: generated.sections.map(s => ({ ...s, exercises: s.exercises.map(e => ({ ...e })) })),
+                        sections: generated.sections.map((s) => ({
+                          ...s,
+                          exercises: s.exercises.map((e) => ({ ...e })),
+                        })),
                         progressionNotes: generated.progressionNotes || '',
                       });
                       const expanded: Record<number, boolean> = {};
-                      generated.sections.forEach((_, i) => { expanded[i] = true; });
+                      generated.sections.forEach((_, i) => {
+                        expanded[i] = true;
+                      });
                       setExpandedSections(expanded);
                       setSelectedPlan(selectedPlan);
                       setViewState('edit');
                       setAiPrompt('');
                     })
-                    .catch(() => setError(t('plans.failedToGenerate', { defaultValue: 'Failed to generate. Try again.' })))
+                    .catch(() =>
+                      setError(
+                        t('plans.failedToGenerate', {
+                          defaultValue: 'Failed to generate. Try again.',
+                        }),
+                      ),
+                    )
                     .finally(() => setAiGenerating(false));
                 }
               }}
-              placeholder={t('plans.aiEditPlaceholder', { defaultValue: 'e.g., "Ersetze Leg Curls durch Nordic Hamstring Curls" or "Mehr Mobility Übungen"' })}
+              placeholder={t('plans.aiEditPlaceholder', {
+                defaultValue:
+                  'e.g., "Ersetze Leg Curls durch Nordic Hamstring Curls" or "Mehr Mobility Übungen"',
+              })}
               className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <button
@@ -498,17 +600,28 @@ export default function Plans() {
                     setForm({
                       name: generated.name,
                       workoutTitle: generated.workoutTitle,
-                      sections: generated.sections.map(s => ({ ...s, exercises: s.exercises.map(e => ({ ...e })) })),
+                      sections: generated.sections.map((s) => ({
+                        ...s,
+                        exercises: s.exercises.map((e) => ({ ...e })),
+                      })),
                       progressionNotes: generated.progressionNotes || '',
                     });
                     const expanded: Record<number, boolean> = {};
-                    generated.sections.forEach((_, i) => { expanded[i] = true; });
+                    generated.sections.forEach((_, i) => {
+                      expanded[i] = true;
+                    });
                     setExpandedSections(expanded);
                     setSelectedPlan(selectedPlan);
                     setViewState('edit');
                     setAiPrompt('');
                   })
-                  .catch(() => setError(t('plans.failedToGenerate', { defaultValue: 'Failed to generate. Try again.' })))
+                  .catch(() =>
+                    setError(
+                      t('plans.failedToGenerate', {
+                        defaultValue: 'Failed to generate. Try again.',
+                      }),
+                    ),
+                  )
                   .finally(() => setAiGenerating(false));
               }}
               disabled={!aiPrompt.trim() || aiGenerating}
@@ -563,18 +676,22 @@ export default function Plans() {
         {/* Plan metadata */}
         <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">{t('plans.planName')}</label>
+            <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">
+              {t('plans.planName')}
+            </label>
             <Input
               value={form.name}
-              onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               placeholder={t('plans.planNamePlaceholder')}
             />
           </div>
           <div>
-            <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">{t('plans.workoutTitle')}</label>
+            <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">
+              {t('plans.workoutTitle')}
+            </label>
             <Input
               value={form.workoutTitle}
-              onChange={e => setForm(f => ({ ...f, workoutTitle: e.target.value }))}
+              onChange={(e) => setForm((f) => ({ ...f, workoutTitle: e.target.value }))}
               placeholder={t('plans.workoutTitlePlaceholder')}
             />
           </div>
@@ -583,43 +700,60 @@ export default function Plans() {
         {/* Sections */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">{t('plans.sections')}</h2>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">
+              {t('plans.sections')}
+            </h2>
           </div>
           {form.sections.map((section, sIdx) => {
             const Icon = getSectionIcon(sIdx);
             const isExpanded = expandedSections[sIdx];
 
             return (
-              <div key={sIdx} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+              <div
+                key={sIdx}
+                className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden"
+              >
                 {/* Section header */}
                 <div className="p-4 flex items-center gap-3 bg-slate-50 dark:bg-slate-800/30">
-                  <button onClick={() => toggleSection(sIdx)} className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                      isExpanded ? 'bg-indigo-500/20' : 'bg-slate-100 dark:bg-slate-800'
-                    }`}>
-                      <Icon size={16} className={isExpanded ? 'text-indigo-400' : 'text-slate-400'} />
+                  <button
+                    onClick={() => toggleSection(sIdx)}
+                    className="flex items-center gap-3 flex-1 min-w-0"
+                  >
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                        isExpanded ? 'bg-indigo-500/20' : 'bg-slate-100 dark:bg-slate-800'
+                      }`}
+                    >
+                      <Icon
+                        size={16}
+                        className={isExpanded ? 'text-indigo-400' : 'text-slate-400'}
+                      />
                     </div>
-                    {isExpanded
-                      ? <ChevronUp size={16} className="text-slate-400 shrink-0" />
-                      : <ChevronDown size={16} className="text-slate-600 shrink-0" />
-                    }
+                    {isExpanded ? (
+                      <ChevronUp size={16} className="text-slate-400 shrink-0" />
+                    ) : (
+                      <ChevronDown size={16} className="text-slate-600 shrink-0" />
+                    )}
                   </button>
                   <Input
                     className="flex-1"
                     value={section.name}
-                    onChange={e => updateSection(sIdx, { name: e.target.value })}
+                    onChange={(e) => updateSection(sIdx, { name: e.target.value })}
                     placeholder={t('plans.sectionName')}
-                    onClick={e => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   <Input
                     className="w-28"
                     value={section.duration || ''}
-                    onChange={e => updateSection(sIdx, { duration: e.target.value })}
+                    onChange={(e) => updateSection(sIdx, { duration: e.target.value })}
                     placeholder={t('plans.duration')}
-                    onClick={e => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   {form.sections.length > 1 && (
-                    <button onClick={() => removeSection(sIdx)} className="p-1 text-slate-400 hover:text-red-400 transition-colors shrink-0">
+                    <button
+                      onClick={() => removeSection(sIdx)}
+                      className="p-1 text-slate-400 hover:text-red-400 transition-colors shrink-0"
+                    >
                       <X size={16} />
                     </button>
                   )}
@@ -629,31 +763,39 @@ export default function Plans() {
                 {isExpanded && (
                   <div className="px-4 py-3 space-y-2">
                     {section.exercises.map((ex, eIdx) => (
-                      <div key={eIdx} className="flex items-start gap-2 py-2 border-b border-slate-200/50 dark:border-slate-800/50 last:border-b-0 last:pb-0 first:pt-0">
+                      <div
+                        key={eIdx}
+                        className="flex items-start gap-2 py-2 border-b border-slate-200/50 dark:border-slate-800/50 last:border-b-0 last:pb-0 first:pt-0"
+                      >
                         <div className="flex-1 grid grid-cols-2 gap-2">
                           <Input
                             value={ex.name}
-                            onChange={e => updateExercise(sIdx, eIdx, { name: e.target.value })}
+                            onChange={(e) => updateExercise(sIdx, eIdx, { name: e.target.value })}
                             placeholder={t('plans.exerciseName')}
                           />
                           <Input
                             value={ex.setsReps}
-                            onChange={e => updateExercise(sIdx, eIdx, { setsReps: e.target.value })}
+                            onChange={(e) =>
+                              updateExercise(sIdx, eIdx, { setsReps: e.target.value })
+                            }
                             placeholder={t('plans.setsReps')}
                           />
                           <Input
                             value={ex.rest || ''}
-                            onChange={e => updateExercise(sIdx, eIdx, { rest: e.target.value })}
+                            onChange={(e) => updateExercise(sIdx, eIdx, { rest: e.target.value })}
                             placeholder={t('plans.restPlaceholder')}
                           />
                           <Input
                             value={ex.notes || ''}
-                            onChange={e => updateExercise(sIdx, eIdx, { notes: e.target.value })}
+                            onChange={(e) => updateExercise(sIdx, eIdx, { notes: e.target.value })}
                             placeholder={t('plans.notesPlaceholder')}
                           />
                         </div>
                         {section.exercises.length > 1 && (
-                          <button onClick={() => removeExercise(sIdx, eIdx)} className="text-slate-400 hover:text-red-400 mt-2 transition-colors">
+                          <button
+                            onClick={() => removeExercise(sIdx, eIdx)}
+                            className="text-slate-400 hover:text-red-400 mt-2 transition-colors"
+                          >
                             <X size={14} />
                           </button>
                         )}
@@ -680,10 +822,12 @@ export default function Plans() {
 
         {/* Progression notes */}
         <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-          <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">{t('plans.progression')}</label>
+          <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">
+            {t('plans.progression')}
+          </label>
           <textarea
             value={form.progressionNotes}
-            onChange={e => setForm(f => ({ ...f, progressionNotes: e.target.value }))}
+            onChange={(e) => setForm((f) => ({ ...f, progressionNotes: e.target.value }))}
             placeholder={t('plans.progressionPlaceholder')}
             className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
             rows={3}
@@ -717,10 +861,16 @@ export default function Plans() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('plans.title')}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          {t('plans.title')}
+        </h1>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { setViewState('generate'); setAiPrompt(''); setError(''); }}
+            onClick={() => {
+              setViewState('generate');
+              setAiPrompt('');
+              setError('');
+            }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 transition-colors active:scale-95"
           >
             <Sparkles size={14} /> AI
@@ -751,11 +901,17 @@ export default function Plans() {
           {/* Stats bento */}
           <div className="grid grid-cols-2 gap-3 mb-6">
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-4 rounded-xl">
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">{t('plans.title')}</p>
-              <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tabular-nums">{plans.length}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">
+                {t('plans.title')}
+              </p>
+              <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tabular-nums">
+                {plans.length}
+              </p>
             </div>
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-4 rounded-xl">
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">{t('common.exercises')}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">
+                {t('common.exercises')}
+              </p>
               <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tabular-nums">
                 {plans.reduce((sum, p) => sum + totalExercises(p), 0)}
               </p>
@@ -764,26 +920,35 @@ export default function Plans() {
 
           {/* Plan cards */}
           <div className="space-y-3">
-            {plans.map(plan => (
+            {plans.map((plan) => (
               <div
                 key={plan._id}
                 className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group cursor-pointer"
                 onClick={() => handleView(plan)}
               >
                 <div className="space-y-1">
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">{plan.name}</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+                    {plan.name}
+                  </h3>
                   <div className="flex items-center gap-2 text-xs text-slate-400 flex-wrap">
                     <span className="flex items-center gap-1">
                       <Timer size={12} className="text-slate-400" />
                       {formatEstimatedDuration(estimateDuration(plan))}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
-                    <span>{totalExercises(plan)} {t('common.exercises')}</span>
+                    <span>
+                      {totalExercises(plan)} {t('common.exercises')}
+                    </span>
                     <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
-                    <span className="truncate max-w-[200px]">{sectionPreview(plan) || plan.workoutTitle}</span>
+                    <span className="truncate max-w-[200px]">
+                      {sectionPreview(plan) || plan.workoutTitle}
+                    </span>
                   </div>
                 </div>
-                <ChevronRight size={18} className="text-slate-400 dark:text-slate-600 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors shrink-0" />
+                <ChevronRight
+                  size={18}
+                  className="text-slate-400 dark:text-slate-600 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors shrink-0"
+                />
               </div>
             ))}
           </div>

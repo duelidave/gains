@@ -14,12 +14,7 @@ const STATUS_TITLES: Record<number, string> = {
   500: 'Internal Server Error',
 };
 
-export function sendProblem(
-  res: Response,
-  status: number,
-  detail: string,
-  instance: string,
-): void {
+export function sendProblem(res: Response, status: number, detail: string, instance: string): void {
   res
     .status(status)
     .contentType('application/problem+json')
@@ -32,12 +27,7 @@ export function sendProblem(
     });
 }
 
-export function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  _next: NextFunction,
-): void {
+export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction): void {
   const status = err instanceof ApiError ? err.status : 500;
   const detail = status === 500 ? 'Internal server error' : err.message;
 

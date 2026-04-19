@@ -7,7 +7,7 @@ export interface DisplaySet {
   unit: string;
   isDropset: boolean;
   repsDisplay?: string;
-  durationSeconds?: number;  // unified duration in seconds
+  durationSeconds?: number; // unified duration in seconds
   distance?: number;
   distanceUnit?: string;
 }
@@ -54,10 +54,10 @@ export interface ExerciseColumns {
 
 export function detectColumns(sets: DisplaySet[]): ExerciseColumns {
   return {
-    showReps: sets.some(s => s.reps > 0),
-    showWeight: sets.some(s => s.weight > 0),
-    showDuration: sets.some(s => (s.durationSeconds ?? 0) > 0),
-    showDistance: sets.some(s => (s.distance ?? 0) > 0),
+    showReps: sets.some((s) => s.reps > 0),
+    showWeight: sets.some((s) => s.weight > 0),
+    showDuration: sets.some((s) => (s.durationSeconds ?? 0) > 0),
+    showDistance: sets.some((s) => (s.distance ?? 0) > 0),
   };
 }
 

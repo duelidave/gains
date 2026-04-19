@@ -18,7 +18,7 @@ const userSchema = new Schema<IUser>(
     passwordHash: { type: String },
     settings: { type: Schema.Types.Mixed, default: {} },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const User = mongoose.model<IUser>('User', userSchema);

@@ -19,7 +19,6 @@ export default function Workouts() {
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
   const { hasDraft } = useDraft();
-  const hasSession = hasDraft;
 
   const fetchWorkouts = useCallback(async () => {
     setLoading(true);
@@ -47,16 +46,19 @@ export default function Workouts() {
     }
   }, [page, setSearchParams]);
 
-  const getTotalSets = (w: Workout) =>
-    w.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+  const getTotalSets = (w: Workout) => w.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
 
   return (
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-end justify-between mb-6">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">{t('workouts.title')}</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{t('workouts.subtitle', { defaultValue: '' })}</p>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            {t('workouts.title')}
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+            {t('workouts.subtitle', { defaultValue: '' })}
+          </p>
         </div>
         <button
           onClick={() => navigate('/workouts/new')}
@@ -64,7 +66,7 @@ export default function Workouts() {
         >
           <Plus size={16} />
           <span className="text-sm font-bold">
-            {hasSession ? t('workouts.continueWorkout') : t('workouts.newWorkout')}
+            {hasDraft ? t('workouts.continueWorkout') : t('workouts.newWorkout')}
           </span>
         </button>
       </div>
@@ -91,21 +93,34 @@ export default function Workouts() {
                 <div className="group bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/60 rounded-xl p-5 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all duration-300 active:scale-[0.98]">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{w.title}</h3>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        {w.title}
+                      </h3>
                       <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">
                         {formatDate(w.date, 'short', i18n.language)}
                       </p>
                     </div>
-                    <ChevronRight size={20} className="text-slate-400 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 transition-colors mt-1" />
+                    <ChevronRight
+                      size={20}
+                      className="text-slate-400 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 transition-colors mt-1"
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-slate-50 dark:bg-slate-950/50 rounded-lg p-2 border border-slate-200 dark:border-slate-800/30">
-                      <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">{t('workouts.exercises', { defaultValue: 'Exercises' })}</p>
-                      <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">{w.exercises.length}</p>
+                      <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">
+                        {t('workouts.exercises', { defaultValue: 'Exercises' })}
+                      </p>
+                      <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                        {w.exercises.length}
+                      </p>
                     </div>
                     <div className="bg-slate-50 dark:bg-slate-950/50 rounded-lg p-2 border border-slate-200 dark:border-slate-800/30">
-                      <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">{t('workouts.totalSets', { defaultValue: 'Total Sets' })}</p>
-                      <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">{getTotalSets(w)}</p>
+                      <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">
+                        {t('workouts.totalSets', { defaultValue: 'Total Sets' })}
+                      </p>
+                      <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                        {getTotalSets(w)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -146,12 +161,12 @@ export default function Workouts() {
               onClick={() => navigate('/workouts/new')}
               className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl shadow-lg shadow-indigo-500/20 active:scale-90 transition-all duration-200 flex items-center gap-2"
             >
-              <Plus size={16} /> <span className="text-sm font-bold">{t('workouts.logWorkout')}</span>
+              <Plus size={16} />{' '}
+              <span className="text-sm font-bold">{t('workouts.logWorkout')}</span>
             </button>
           }
         />
       )}
-
     </div>
   );
 }

@@ -7,11 +7,16 @@ function escapeRegex(str: string): string {
 function getFromDate(period: string): Date | null {
   const now = new Date();
   switch (period) {
-    case '1M': return new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-    case '3M': return new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
-    case '6M': return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
-    case '1Y': return new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-    default: return null; // 'All'
+    case '1M':
+      return new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    case '3M':
+      return new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+    case '6M':
+      return new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
+    case '1Y':
+      return new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+    default:
+      return null; // 'All'
   }
 }
 
@@ -51,10 +56,12 @@ export const ProgressService = {
         $addFields: {
           'exercises.sets.e1rm': {
             $cond: {
-              if: { $and: [
-                { $gt: [{ $ifNull: ['$exercises.sets.weight', 0] }, 0] },
-                { $gt: [{ $ifNull: ['$exercises.sets.reps', 0] }, 0] },
-              ]},
+              if: {
+                $and: [
+                  { $gt: [{ $ifNull: ['$exercises.sets.weight', 0] }, 0] },
+                  { $gt: [{ $ifNull: ['$exercises.sets.reps', 0] }, 0] },
+                ],
+              },
               then: {
                 $multiply: [
                   '$exercises.sets.weight',
@@ -71,12 +78,14 @@ export const ProgressService = {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
           bestWeight: { $max: { $ifNull: ['$exercises.sets.weight', 0] } },
           bestE1rm: { $max: '$exercises.sets.e1rm' },
-          sets: { $push: {
-            reps: { $ifNull: ['$exercises.sets.reps', 0] },
-            weight: { $ifNull: ['$exercises.sets.weight', 0] },
-            e1rm: '$exercises.sets.e1rm',
-            workoutId: '$workoutId',
-          }},
+          sets: {
+            $push: {
+              reps: { $ifNull: ['$exercises.sets.reps', 0] },
+              weight: { $ifNull: ['$exercises.sets.weight', 0] },
+              e1rm: '$exercises.sets.e1rm',
+              workoutId: '$workoutId',
+            },
+          },
         },
       },
       { $sort: { _id: 1 } },
@@ -95,14 +104,17 @@ export const ProgressService = {
 
       // Find the set that produced the best e1RM
       const bestSetData = r.sets.reduce(
-        (best: { reps: number; weight: number; e1rm: number; workoutId: unknown } | null, s: { reps: number; weight: number; e1rm: number; workoutId: unknown }) =>
-          (!best || s.e1rm > best.e1rm) ? s : best,
+        (
+          best: { reps: number; weight: number; e1rm: number; workoutId: unknown } | null,
+          s: { reps: number; weight: number; e1rm: number; workoutId: unknown },
+        ) => (!best || s.e1rm > best.e1rm ? s : best),
         null,
       );
 
       const setsCount = bestSetData
-        ? r.sets.filter((s: { reps: number; weight: number }) =>
-            s.reps === bestSetData.reps && s.weight === bestSetData.weight
+        ? r.sets.filter(
+            (s: { reps: number; weight: number }) =>
+              s.reps === bestSetData.reps && s.weight === bestSetData.weight,
           ).length
         : 0;
 
@@ -112,11 +124,13 @@ export const ProgressService = {
         isPR,
         e1rm: bestE1rm,
         isE1rmPR,
-        bestSet: bestSetData ? {
-          reps: bestSetData.reps,
-          weight: bestSetData.weight,
-          setsCount,
-        } : null,
+        bestSet: bestSetData
+          ? {
+              reps: bestSetData.reps,
+              weight: bestSetData.weight,
+              setsCount,
+            }
+          : null,
         workoutId: bestSetData?.workoutId ? bestSetData.workoutId.toString() : null,
       };
     });

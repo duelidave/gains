@@ -18,13 +18,14 @@ router.post('/', validateBody(parseRequestSchema), async (req: AuthRequest, res:
     const existingNames = await ExerciseService.getNames(req.user!.keycloakId);
     const namesList = existingNames.slice(0, 200);
 
-    const exerciseNameSection = namesList.length > 0
-      ? `\nEXERCISE NAME NORMALIZATION:
+    const exerciseNameSection =
+      namesList.length > 0
+        ? `\nEXERCISE NAME NORMALIZATION:
 The user has previously logged these exercise names:
-${namesList.map(n => `- "${n}"`).join('\n')}
+${namesList.map((n) => `- "${n}"`).join('\n')}
 
 When the user types an exercise that matches one of these (even with different casing, spelling, abbreviation, singular/plural, or missing qualifiers like "(Maschine)" or "(KH)"), you MUST use the EXISTING name from the list above. Only create a new exercise name if it truly does not match any existing name.\n`
-      : '';
+        : '';
 
     // Load user's training plans for dynamic workout types
     const plans = await TrainingPlan.find({ userId: req.user!.keycloakId });
@@ -33,20 +34,27 @@ When the user types an exercise that matches one of these (even with different c
     let exerciseHintsSection = '';
 
     if (plans.length > 0) {
-      const typeLines = plans.map(p => {
-        const exercises = p.sections.flatMap(s => s.exercises.map(e => e.name));
-        return `- "${p.workoutTitle}" — ${p.name} (${exercises.slice(0, 5).join(', ')}${exercises.length > 5 ? ', etc.' : ''})`;
-      }).join('\n');
-      const titles = plans.map(p => `"${p.workoutTitle}"`).join(', ');
+      const typeLines = plans
+        .map((p) => {
+          const exercises = p.sections.flatMap((s) => s.exercises.map((e) => e.name));
+          return `- "${p.workoutTitle}" — ${p.name} (${exercises.slice(0, 5).join(', ')}${exercises.length > 5 ? ', etc.' : ''})`;
+        })
+        .join('\n');
+      const titles = plans.map((p) => `"${p.workoutTitle}"`).join(', ');
       workoutTypesSection = `WORKOUT TYPES (title must be exactly one of these):\n${typeLines}\n\nAlways map to exactly one of: ${titles} as the title.\nIf the workout type is unclear from context, infer it from the exercises.`;
 
       // Build exercise hints from plan sections
-      const hints = plans.map(p => {
-        const sectionHints = p.sections.map(s =>
-          `  ${s.name}: ${s.exercises.map(e => `${e.name} (${e.setsReps})`).join(', ')}`
-        ).join('\n');
-        return `${p.name} (${p.workoutTitle}):\n${sectionHints}`;
-      }).join('\n');
+      const hints = plans
+        .map((p) => {
+          const sectionHints = p.sections
+            .map(
+              (s) =>
+                `  ${s.name}: ${s.exercises.map((e) => `${e.name} (${e.setsReps})`).join(', ')}`,
+            )
+            .join('\n');
+          return `${p.name} (${p.workoutTitle}):\n${sectionHints}`;
+        })
+        .join('\n');
       exerciseHintsSection = `\nEXERCISE HINTS FROM TRAINING PLANS:\n${hints}\nUse these as reference for expected exercises and their typical sets/reps.\n`;
     } else {
       workoutTypesSection = `WORKOUT TYPES (title must be exactly one of these):
@@ -126,7 +134,10 @@ ${messages.map((m: string, i: number) => `${i + 1}. ${m}`).join('\n')}`;
     const text = response.content[0].type === 'text' ? response.content[0].text : '';
 
     // Parse the JSON response, stripping any accidental markdown fences
-    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const cleaned = text
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
     const rawParsed = JSON.parse(cleaned);
 
     // Server sets the date — don't rely on the LLM for this
@@ -138,7 +149,12 @@ ${messages.map((m: string, i: number) => `${i + 1}. ${m}`).join('\n')}`;
     const validated = createWorkoutSchema.safeParse(rawParsed);
     if (!validated.success) {
       console.error('LLM returned invalid workout structure:', validated.error.issues);
-      sendProblem(res, 502, 'AI returned invalid workout structure, please try again', req.originalUrl);
+      sendProblem(
+        res,
+        502,
+        'AI returned invalid workout structure, please try again',
+        req.originalUrl,
+      );
       return;
     }
 

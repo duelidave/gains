@@ -33,11 +33,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
     refresh();
   }, [authenticated, refresh]);
 
-  return (
-    <DraftContext.Provider value={{ hasDraft, refresh }}>
-      {children}
-    </DraftContext.Provider>
-  );
+  return <DraftContext.Provider value={{ hasDraft, refresh }}>{children}</DraftContext.Provider>;
 }
 
 export function useDraft() {

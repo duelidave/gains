@@ -68,7 +68,10 @@ router.put('/:id', validateBody(updatePlanSchema), async (req: AuthRequest, res:
 // DELETE /:id — delete plan
 router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
-    const plan = await TrainingPlan.findOneAndDelete({ _id: req.params.id, userId: req.user!.keycloakId });
+    const plan = await TrainingPlan.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user!.keycloakId,
+    });
     if (!plan) {
       sendProblem(res, 404, 'Plan not found', req.originalUrl);
       return;

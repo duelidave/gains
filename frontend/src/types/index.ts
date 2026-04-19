@@ -5,8 +5,8 @@ export interface ApiSet {
   unit?: string;
   repsDisplay?: string;
   weight_kg?: number | number[];
-  type?: string;           // "dropset"
-  duration?: number;       // seconds (from AI parser)
+  type?: string; // "dropset"
+  duration?: number; // seconds (from AI parser)
   duration_minutes?: number; // from import
   duration_seconds?: number; // from import
   distance?: number;
@@ -18,7 +18,7 @@ export interface ApiExercise {
   name: string;
   category?: string;
   bodyweight?: boolean;
-  weight_unit?: string;  // "per_hand" | "per_side"
+  weight_unit?: string; // "per_hand" | "per_side"
   rest_seconds?: number | null;
   notes?: string | null;
   sets: ApiSet[];

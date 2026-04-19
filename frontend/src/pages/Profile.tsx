@@ -89,9 +89,7 @@ function SettingRow({
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 px-1">
-      {children}
-    </h3>
+    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 px-1">{children}</h3>
   );
 }
 
@@ -119,7 +117,9 @@ export default function Profile() {
             <span className="text-indigo-400 font-bold text-2xl">{initials}</span>
           </div>
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{fullName}</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          {fullName}
+        </h2>
         <p className="text-slate-500 text-sm font-medium">@{username}</p>
       </section>
 
@@ -128,7 +128,13 @@ export default function Profile() {
         <SectionHeader>{t('profile.preferences')}</SectionHeader>
 
         <SettingRow
-          icon={dark ? <Moon size={18} className="text-indigo-400" /> : <Sun size={18} className="text-indigo-400" />}
+          icon={
+            dark ? (
+              <Moon size={18} className="text-indigo-400" />
+            ) : (
+              <Sun size={18} className="text-indigo-400" />
+            )
+          }
           label={t('profile.darkMode')}
           description={t('profile.darkModeDescription')}
         >

@@ -37,19 +37,21 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
   const [date, setDate] = useState(initial?.date || new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState(initial?.notes || '');
   const [exercises, setExercises] = useState<ApiExercise[]>(
-    initial?.exercises?.length ? initial.exercises : [{ ...emptyExercise, sets: [{ ...emptySet }] }]
+    initial?.exercises?.length
+      ? initial.exercises
+      : [{ ...emptyExercise, sets: [{ ...emptySet }] }],
   );
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [activeAutocomplete, setActiveAutocomplete] = useState<number | null>(null);
 
   useEffect(() => {
-    getExerciseNames().then(setSuggestions).catch(() => {});
+    getExerciseNames()
+      .then(setSuggestions)
+      .catch(() => {});
   }, []);
 
   const updateExercise = (idx: number, updates: Partial<ApiExercise>) => {
-    setExercises((prev) =>
-      prev.map((ex, i) => (i === idx ? { ...ex, ...updates } : ex))
-    );
+    setExercises((prev) => prev.map((ex, i) => (i === idx ? { ...ex, ...updates } : ex)));
   };
 
   const addExercise = () => {
@@ -66,16 +68,14 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
       prev.map((ex, i) =>
         i === exIdx
           ? { ...ex, sets: ex.sets.map((s, si) => (si === setIdx ? { ...s, ...updates } : s)) }
-          : ex
-      )
+          : ex,
+      ),
     );
   };
 
   const addSet = (exIdx: number) => {
     setExercises((prev) =>
-      prev.map((ex, i) =>
-        i === exIdx ? { ...ex, sets: [...ex.sets, { ...emptySet }] } : ex
-      )
+      prev.map((ex, i) => (i === exIdx ? { ...ex, sets: [...ex.sets, { ...emptySet }] } : ex)),
     );
   };
 
@@ -84,8 +84,8 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
       prev.map((ex, i) =>
         i === exIdx && ex.sets.length > 1
           ? { ...ex, sets: ex.sets.filter((_, si) => si !== setIdx) }
-          : ex
-      )
+          : ex,
+      ),
     );
   };
 
@@ -138,7 +138,9 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
       {/* Exercises */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-50">{t('workoutForm.exercises')}</h3>
+          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-50">
+            {t('workoutForm.exercises')}
+          </h3>
           <Button type="button" variant="ghost" size="sm" onClick={addExercise}>
             <Plus size={14} /> {t('workoutForm.addExercise')}
           </Button>
@@ -264,9 +266,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
                       <Select
                         className="w-18"
                         value={set.unit || 'kg'}
-                        onChange={(e) =>
-                          updateSet(exIdx, setIdx, { unit: e.target.value })
-                        }
+                        onChange={(e) => updateSet(exIdx, setIdx, { unit: e.target.value })}
                       >
                         <option value="kg">kg</option>
                         <option value="lbs">lbs</option>
@@ -340,7 +340,11 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitting }:
           {t('common.cancel')}
         </Button>
         <Button type="submit" variant="primary" disabled={submitting || !title.trim()}>
-          {submitting ? t('workoutForm.saving') : initial ? t('workoutForm.updateWorkout') : t('workoutForm.saveWorkout')}
+          {submitting
+            ? t('workoutForm.saving')
+            : initial
+              ? t('workoutForm.updateWorkout')
+              : t('workoutForm.saveWorkout')}
         </Button>
       </div>
     </form>
