@@ -74,7 +74,10 @@ export function createApp(): express.Application {
     },
   });
 
-  app.use(globalLimiter);
+  const isDev = process.env.AUTH_PROVIDER === 'dev';
+  if (!isDev) {
+    app.use(globalLimiter);
+  }
 
   // Initialize auth module
   const auth = createAuthModule();
@@ -85,8 +88,10 @@ export function createApp(): express.Application {
   app.use('/api/auth/register', loginLimiter);
   app.use('/api/auth', auth.router);
 
+  const maybeParseLimiter: express.RequestHandler = isDev ? (_req, _res, next) => next() : parseLimiter;
+
   // Protected routes — auth + ensureUser on all
-  app.use('/api/workouts/parse', auth.middleware, ensureUserMiddleware, parseLimiter, parseRouter);
+  app.use('/api/workouts/parse', auth.middleware, ensureUserMiddleware, maybeParseLimiter, parseRouter);
   app.use('/api/workouts/draft', auth.middleware, ensureUserMiddleware, workoutDraftRouter);
   app.use('/api/workouts', auth.middleware, ensureUserMiddleware, workoutRouter);
   app.use('/api/stats', auth.middleware, ensureUserMiddleware, statsRouter);
@@ -94,7 +99,7 @@ export function createApp(): express.Application {
   app.use('/api/settings', auth.middleware, ensureUserMiddleware, settingsRouter);
   app.use('/api/progress', auth.middleware, ensureUserMiddleware, progressRouter);
   app.use('/api/exercises', auth.middleware, ensureUserMiddleware, exercisesRouter);
-  app.use('/api/plans/generate', auth.middleware, ensureUserMiddleware, parseLimiter, generatePlanRouter);
+  app.use('/api/plans/generate', auth.middleware, ensureUserMiddleware, maybeParseLimiter, generatePlanRouter);
   app.use('/api/plans', auth.middleware, ensureUserMiddleware, plansRouter);
 
   // Global error handler (RFC 9457)

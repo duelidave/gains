@@ -27,4 +27,8 @@ export interface LocalConfig {
   registrationEnabled: boolean;
 }
 
-export type AuthConfig = KeycloakConfig | OidcConfig | LocalConfig;
+export interface DevConfig {
+  provider: 'dev';
+}
+
+export type AuthConfig = KeycloakConfig | OidcConfig | LocalConfig | DevConfig;

@@ -5,6 +5,7 @@ import { Skeleton } from '../components/ui/Skeleton';
 import { KeycloakAuthProvider } from './KeycloakAuth';
 import { OidcAuthProvider } from './OidcAuth';
 import { LocalAuthProvider } from './LocalAuth';
+import { DevAuthProvider } from './DevAuth';
 import type { AuthState, AuthConfig } from './types';
 
 export const AuthContext = createContext<AuthState>({
@@ -63,6 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return <OidcAuthProvider config={config}>{children}</OidcAuthProvider>;
     case 'local':
       return <LocalAuthProvider config={config}>{children}</LocalAuthProvider>;
+    case 'dev':
+      return <DevAuthProvider>{children}</DevAuthProvider>;
   }
 }
 

@@ -2,6 +2,7 @@ import { AuthModule, AuthProviderType } from './types';
 import { createKeycloakAuth } from './keycloak';
 import { createOidcAuth } from './oidc';
 import { createLocalAuth } from './local';
+import { createDevAuth } from './dev';
 
 export function createAuthModule(): AuthModule {
   const provider = (process.env.AUTH_PROVIDER || 'keycloak') as AuthProviderType;
@@ -15,7 +16,9 @@ export function createAuthModule(): AuthModule {
       return createOidcAuth();
     case 'local':
       return createLocalAuth();
+    case 'dev':
+      return createDevAuth();
     default:
-      throw new Error(`Unknown AUTH_PROVIDER: ${provider}. Must be keycloak, oidc, or local.`);
+      throw new Error(`Unknown AUTH_PROVIDER: ${provider}. Must be keycloak, oidc, local, or dev.`);
   }
 }

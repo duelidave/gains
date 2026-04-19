@@ -1,7 +1,7 @@
 import { Response, NextFunction, Router } from 'express';
 import { AuthRequest } from '../types';
 
-export type AuthProviderType = 'keycloak' | 'oidc' | 'local';
+export type AuthProviderType = 'keycloak' | 'oidc' | 'local' | 'dev';
 
 export interface AuthModule {
   middleware: (req: AuthRequest, res: Response, next: NextFunction) => void;
