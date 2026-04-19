@@ -18,6 +18,7 @@ import exercisesRouter from './routes/exercises';
 import parseRouter from './routes/parse';
 import plansRouter from './routes/plans';
 import generatePlanRouter from './routes/generatePlan';
+import workoutDraftRouter from './routes/workoutDraft';
 
 export function createApp(): express.Application {
   const app = express();
@@ -86,6 +87,7 @@ export function createApp(): express.Application {
 
   // Protected routes — auth + ensureUser on all
   app.use('/api/workouts/parse', auth.middleware, ensureUserMiddleware, parseLimiter, parseRouter);
+  app.use('/api/workouts/draft', auth.middleware, ensureUserMiddleware, workoutDraftRouter);
   app.use('/api/workouts', auth.middleware, ensureUserMiddleware, workoutRouter);
   app.use('/api/stats', auth.middleware, ensureUserMiddleware, statsRouter);
   app.use('/api/user', auth.middleware, ensureUserMiddleware, userRouter);

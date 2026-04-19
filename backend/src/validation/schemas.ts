@@ -65,6 +65,10 @@ export const parseRequestSchema = z.object({
   messages: z.array(z.string().min(1).max(1000)).min(1, 'messages must be a non-empty array of strings').max(50),
 });
 
+// ---------- Workout draft schema ----------
+
+export const workoutDraftSchema = z.object({}).passthrough();
+
 // ---------- Exercise merge schema ----------
 
 export const mergeExercisesSchema = z.object({

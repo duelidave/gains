@@ -2,11 +2,12 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Dumbbell, ClipboardList, TrendingUp, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
-import { hasChatSession } from '../lib/chatSession';
+import { useDraft } from '../context/DraftContext';
 
 export function BottomNav() {
   const { t } = useTranslation();
-  const hasSession = hasChatSession();
+  const { hasDraft } = useDraft();
+  const hasSession = hasDraft;
 
   const links = [
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard'), dot: false },

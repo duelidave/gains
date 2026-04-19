@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import { ThemeProvider } from './context/ThemeContext';
 import { SettingsProvider } from './context/SettingsContext';
+import { DraftProvider } from './context/DraftContext';
 import { Layout } from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Workouts from './pages/Workouts';
@@ -33,19 +34,21 @@ function AuthenticatedApp() {
 
   return (
     <SettingsProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/workouts" element={<Workouts />} />
-            <Route path="/workouts/new" element={<WorkoutChat />} />
-            <Route path="/workouts/:id" element={<WorkoutDetail />} />
-            <Route path="/plans" element={<Plans />} />
-            <Route path="/progress" element={<Progress />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <DraftProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/workouts" element={<Workouts />} />
+              <Route path="/workouts/new" element={<WorkoutChat />} />
+              <Route path="/workouts/:id" element={<WorkoutDetail />} />
+              <Route path="/plans" element={<Plans />} />
+              <Route path="/progress" element={<Progress />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </DraftProvider>
     </SettingsProvider>
   );
 }

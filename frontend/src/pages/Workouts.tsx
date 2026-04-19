@@ -7,7 +7,7 @@ import { EmptyState } from '../components/EmptyState';
 import { getWorkouts } from '../lib/api';
 import type { Workout } from '../types';
 import { formatDate } from '../lib/date';
-import { hasChatSession } from '../lib/chatSession';
+import { useDraft } from '../context/DraftContext';
 
 export default function Workouts() {
   const { t, i18n } = useTranslation();
@@ -18,7 +18,8 @@ export default function Workouts() {
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
-  const hasSession = hasChatSession();
+  const { hasDraft } = useDraft();
+  const hasSession = hasDraft;
 
   const fetchWorkouts = useCallback(async () => {
     setLoading(true);

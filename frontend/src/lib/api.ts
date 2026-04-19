@@ -87,6 +87,31 @@ export function parseWorkout(messages: string[]) {
   });
 }
 
+// Workout draft (server-side chat persistence)
+export async function getDraft(): Promise<{ state: unknown } | null> {
+  const token = await getToken();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(`${BASE}/workouts/draft`, { headers });
+  if (res.status === 204) return null;
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || body.message || `Request failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+export function putDraft(state: unknown) {
+  return request<{ ok: true }>('/workouts/draft', {
+    method: 'PUT',
+    body: JSON.stringify(state),
+  });
+}
+
+export function deleteDraft() {
+  return request<void>('/workouts/draft', { method: 'DELETE' });
+}
+
 // Stats
 export function getStreak() {
   return request<StreakData>('/stats/streak');
